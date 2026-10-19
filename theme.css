@@ -1,0 +1,25 @@
+/* ZAIG — "governance stack": deep plum, orchid and gold; layered-ledger motif. */
+:root {
+  --bg: #f6f5f7; --surface: #ffffff; --surface-2: #ecebed; --ink: #170e29; --ink-2: #595367; --ink-3: #686374; --line: #dddbe0;
+  --accent: #7a3fa0; --accent-ink: #ffffff; --accent-soft: #eee6f3; --accent-2: #7d5f00; --accent-2-soft: #ede9db;
+  --good: #1d7a4b; --good-soft: #dcf1e4; --bad: #b42a2a; --bad-soft: #f9e2e0; --warn: #b77800; --warn-soft: #fbefd3; --on-status: #ffffff;
+  --hero-bg: #1b1030; --hero-ink: #fcfaff; --hero-ink-2: #afabb7; --hero-accent: #c79bff;
+  --motif: radial-gradient(circle at 82% 28%, rgba(199,155,255,0.24), transparent 46%), radial-gradient(circle at 12% 88%, rgba(242,201,76,0.16), transparent 42%), repeating-linear-gradient(135deg, transparent 0 38px, rgba(199,155,255,0.07) 38px 39px);
+  --sg-line: #494059; --sg-accent: #c79bff; --sg-accent-2: #f2c94c; --sg-node: #221736; --sg-ink: #fcfaff; --sg-ink-2: #afabb7;
+  --f-display: "Sora", "IBM Plex Sans", "Segoe UI", sans-serif; --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; --f-mono: "IBM Plex Mono", Consolas, monospace;
+  --radius: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --bg: #0f091a; --surface: #160d26; --surface-2: #261c3a; --ink: #fcf9ff; --ink-2: #b6b3bd; --ink-3: #8f8a99; --line: #362d49;
+  --accent: #c79bff; --accent-ink: #0f091a; --accent-soft: #342648; --accent-2: #f2c94c; --accent-2-soft: #332822;
+  --good: #5bd39a; --good-soft: #10301f; --bad: #ff7a7a; --bad-soft: #3a1616; --warn: #f2b84c; --warn-soft: #3a2c10; --on-status: #0f091a;
+  color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f091a; --surface: #160d26; --surface-2: #261c3a; --ink: #fcf9ff; --ink-2: #b6b3bd; --ink-3: #8f8a99; --line: #362d49;
+  --accent: #c79bff; --accent-ink: #0f091a; --accent-soft: #342648; --accent-2: #f2c94c; --accent-2-soft: #332822;
+  --good: #5bd39a; --good-soft: #10301f; --bad: #ff7a7a; --bad-soft: #3a1616; --warn: #f2b84c; --warn-soft: #3a2c10; --on-status: #0f091a;
+  color-scheme: dark;
+}
