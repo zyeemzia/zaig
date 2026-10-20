@@ -29,7 +29,7 @@ TRACK.meta = {
       "One full AI impact assessment for the highest-risk system",
       "Data governance and privacy plan: lawful basis, provenance, minimisation and retention",
       "Lifecycle controls: stage gates, model documentation, bias testing and monitoring plan",
-      "Generative-AI acceptable-use policy and a third-party AI due-diligence questionnaire",
+      "Generative-AI acceptable-use policy, including rules for AI agents, and a third-party AI due-diligence questionnaire",
       "AI incident response playbook with severity levels and reporting duties",
       "Governance operating model, assurance plan, metrics dashboard and a board report"
     ],

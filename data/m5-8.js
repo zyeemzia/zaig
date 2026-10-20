@@ -75,34 +75,114 @@ TRACK.modules.push({
      "title": "Provenance and lineage"
     },
     {
-     "type": "flow",
+     "type": "topology",
      "title": "Data lineage for a credit model",
-     "items": [
+     "nodes": [
       {
-       "label": "Sources",
-       "text": "Wallet transactions, KYC records, bureau data"
+       "id": "wal",
+       "kind": "db",
+       "label": "Wallet records",
+       "sub": "Transactions",
+       "x": 0,
+       "y": 0
       },
       {
+       "id": "kyc",
+       "kind": "db",
+       "label": "KYC records",
+       "sub": "Identity checks",
+       "x": 2,
+       "y": 0
+      },
+      {
+       "id": "bur",
+       "kind": "api",
+       "label": "Credit bureau",
+       "sub": "Data-sharing agreement",
+       "x": 4,
+       "y": 0
+      },
+      {
+       "id": "ing",
+       "kind": "process",
        "label": "Ingestion",
-       "text": "Extracted under data-sharing agreement"
+       "sub": "Extract and validate",
+       "x": 2,
+       "y": 1.5
       },
       {
-       "label": "Preparation",
-       "text": "Cleaned, joined, features engineered"
+       "id": "fs",
+       "kind": "storage",
+       "label": "Feature store",
+       "sub": "Cleaned, joined features",
+       "x": 2,
+       "y": 3
       },
       {
-       "label": "Training set",
-       "text": "Versioned snapshot with documentation"
+       "id": "ts",
+       "kind": "db",
+       "label": "Training set v7",
+       "sub": "Versioned snapshot",
+       "x": 0,
+       "y": 4.5
       },
       {
-       "label": "Model",
-       "text": "Trained and validated version 3.2"
+       "id": "mdl",
+       "kind": "model",
+       "label": "Model v3.2",
+       "sub": "Validated version",
+       "x": 2,
+       "y": 4.5
       },
       {
-       "label": "Decision",
-       "text": "Score used in loan approval"
+       "id": "dec",
+       "kind": "api",
+       "label": "Loan decision",
+       "sub": "Score + officer review",
+       "x": 4,
+       "y": 4.5
       }
-     ]
+     ],
+     "links": [
+      {
+       "a": "wal",
+       "b": "ing"
+      },
+      {
+       "a": "kyc",
+       "b": "ing"
+      },
+      {
+       "a": "bur",
+       "b": "ing"
+      },
+      {
+       "a": "ing",
+       "b": "fs"
+      },
+      {
+       "a": "fs",
+       "b": "ts",
+       "label": "snapshot"
+      },
+      {
+       "a": "ts",
+       "b": "mdl",
+       "label": "trains"
+      },
+      {
+       "a": "fs",
+       "b": "mdl",
+       "label": "live features",
+       "style": "dashed"
+      },
+      {
+       "a": "mdl",
+       "b": "dec",
+       "label": "score"
+      }
+     ],
+     "caption": "Lineage lets you walk back from any decision to the model version, the training snapshot and the sources behind it, and check the rights attached to each. Live scoring reads the same feature store, so a definition change there affects both training and decisions."
     },
     {
      "type": "framework",
@@ -184,7 +264,7 @@ TRACK.modules.push({
      "situation": "A data scientist finds a well-labelled dataset of customer complaints on a shared drive and wants to use it to train a classifier. Nobody knows where it came from or whether customers were told. What should happen?",
      "options": [
       {
-       "text": "Use it, because it is already inside the company.",
+       "text": "Use it, because it is already inside the company, is well labelled and would save the team weeks of costly annotation work.",
        "feedback": "Internal location says nothing about lawful basis, consent or quality. Unknown provenance is a risk.",
        "best": false
       },
@@ -247,15 +327,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "AI data must be fit for the specific model purpose, lawfully usable for AI and traceable from source to decision.",
+      "Check accuracy, completeness, representativeness, timeliness, consistency and rights for every training and test dataset.",
+      "Record provenance and lineage, version datasets and link every model version to the exact data it used.",
+      "Name data owners, stewards and custodians, and govern labelling as carefully as the data itself."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Which data quality dimension asks whether data reflects the people a model will serve?",
        "options": [
         "Representativeness",
-        "Timeliness",
-        "Consistency",
-        "Encryption"
+        "Timeliness of records",
+        "Consistency of definitions",
+        "Encryption at rest"
        ],
        "answer": 0,
        "explain": "Representativeness checks fit between data and the target population."
@@ -263,10 +353,10 @@ TRACK.modules.push({
       {
        "q": "What does data lineage let you do?",
        "options": [
-        "Trace how data moved from sources to models and decisions",
-        "Encrypt data at rest",
-        "Delete data automatically",
-        "Increase model accuracy directly"
+        "Trace data from sources to models and decisions",
+        "Encrypt every dataset automatically while it is at rest",
+        "Delete data automatically after a set period",
+        "Increase the model's accuracy directly and quickly"
        ],
        "answer": 0,
        "explain": "Lineage records the path of data, which supports audit and investigation."
@@ -285,10 +375,10 @@ TRACK.modules.push({
       {
        "q": "Why link each model version to exact dataset versions?",
        "options": [
-        "To reduce storage costs",
-        "To speed up inference",
-        "To avoid documentation",
-        "To reproduce results, investigate complaints and retrain without specific data"
+        "To reduce the storage costs of keeping older datasets",
+        "To speed up inference when the model scores new cases",
+        "To avoid writing separate documentation for each model",
+        "To reproduce results and handle complaints or erasure"
        ],
        "answer": 3,
        "explain": "Versioned links enable reproducibility and response to rights requests."
@@ -296,10 +386,10 @@ TRACK.modules.push({
       {
        "q": "A labelled dataset of unknown origin should be:",
        "options": [
-        "Used immediately",
-        "Quarantined from training until provenance and rights are established",
-        "Shared publicly",
-        "Merged into all datasets"
+        "Used immediately, since it is already labelled",
+        "Kept out of training until its origin is known",
+        "Shared publicly so that others can help check it",
+        "Merged into all existing training datasets"
        ],
        "answer": 1,
        "explain": "Unknown provenance means unknown legality and quality."
@@ -416,6 +506,57 @@ TRACK.modules.push({
      "title": "Machine unlearning"
     },
     {
+     "type": "sequence",
+     "title": "Handling an erasure request that touches a model",
+     "actors": [
+      "Customer",
+      "Privacy office",
+      "Data team",
+      "Model owner"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Please erase my data"
+      },
+      {
+       "from": 1,
+       "to": 1,
+       "label": "Verify identity; check legal holds"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Delete from datasets and stores"
+      },
+      {
+       "from": 2,
+       "to": 1,
+       "label": "Deleted; added to exclusion list",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 3,
+       "label": "Assess model-level measures"
+      },
+      {
+       "from": 3,
+       "to": 1,
+       "label": "Excluded from next scheduled retrain",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Confirmation within legal deadline",
+       "reply": true
+      }
+     ],
+     "caption": "The exclusion list is the key control: it stops the person's data flowing back in at the next training cycle. Whether earlier model versions must also be retrained depends on the law and the risk, so record the reasoning."
+    },
+    {
      "type": "compare",
      "title": "Sensitive data and children",
      "columns": [
@@ -448,12 +589,12 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Offer voice biometrics as an optional method with clear notice and consent, keep a non-biometric alternative, assess the processing in a DPIA and check accuracy across accents and age groups.",
+       "text": "Make voice biometrics optional with clear notice and consent, keep a non-biometric alternative, run a DPIA and test accuracy across accents and ages.",
        "feedback": "Best. It respects choice, applies extra care to sensitive data and tests for performance gaps that could lock out some customers.",
        "best": true
       },
       {
-       "text": "Use voice biometrics but delete recordings after one day.",
+       "text": "Use voice biometrics for all customers but delete the raw recordings after one day and keep only the voiceprints, which limits what could leak in a breach.",
        "feedback": "Short retention helps but does not resolve basis, choice or fairness issues.",
        "best": false
       },
@@ -532,15 +673,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Data protection law applies to AI in full: lawful basis, transparency, purpose limitation, minimisation, accuracy, security and rights.",
+      "Lawful bases differ by law; India's DPDP Act, for example, relies on consent and listed legitimate uses rather than GDPR-style legitimate interests.",
+      "Privacy notices should say when AI is used, whether data trains models, whether decisions are automated and how to get human review.",
+      "Inferences can be sensitive data and children's data needs extra care; plan in advance how rights such as erasure reach trained models."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Why is consent hard to rely on for training data?",
        "options": [
-        "Withdrawal is difficult to honour once data has shaped a trained model",
-        "Consent is never valid for AI",
-        "Consent cannot be recorded",
-        "Consent applies only to children"
+        "Withdrawal is hard to honour once a model is trained",
+        "Consent is never a valid legal basis for any AI processing",
+        "Consent cannot be recorded in digital systems",
+        "Consent applies only to children's data"
        ],
        "answer": 0,
        "explain": "Consent must be withdrawable, which creates practical challenges after training."
@@ -549,9 +700,9 @@ TRACK.modules.push({
        "q": "Which statement about India's DPDP Act is most accurate?",
        "options": [
         "It copies the GDPR's legitimate-interests basis exactly",
-        "It does not apply to companies",
-        "It relies mainly on consent and a defined list of legitimate uses",
-        "It has no rules on children's data"
+        "It does not apply to companies, only to government",
+        "It relies mainly on consent plus listed legitimate uses",
+        "It has no specific rules on children's data at all"
        ],
        "answer": 2,
        "explain": "The DPDP Act has its own structure of consent and specified legitimate uses, including duties for children's data."
@@ -559,10 +710,10 @@ TRACK.modules.push({
       {
        "q": "An AI system infers customers' religion from shopping patterns. This is:",
        "options": [
-        "Not personal data because it was inferred",
-        "Always lawful if the model is accurate",
-        "Processing that may itself count as sensitive data processing",
-        "Exempt because it is statistical"
+        "Not personal data, because it was only inferred",
+        "Always lawful if the model is accurate enough",
+        "Possibly sensitive data processing in itself",
+        "Exempt because it is purely statistical"
        ],
        "answer": 2,
        "explain": "Inferences about sensitive traits can be sensitive personal data."
@@ -570,10 +721,10 @@ TRACK.modules.push({
       {
        "q": "How do organisations usually honour erasure when data was used to train a model?",
        "options": [
-        "Ignore the request because models are exempt",
+        "Ignore the request because trained models are exempt",
         "Delete the entire model immediately in every case",
-        "Ask the person to pay for retraining",
-        "Delete it from datasets, exclude it from future training and retrain where justified"
+        "Ask the person to pay for the cost of retraining",
+        "Delete from datasets, exclude from future training"
        ],
        "answer": 3,
        "explain": "Practical measures combine dataset deletion, exclusion and proportionate retraining."
@@ -581,10 +732,10 @@ TRACK.modules.push({
       {
        "q": "Which belongs in an AI privacy notice?",
        "options": [
-        "The model's source code",
-        "Whether data is used to train models and how to object where possible",
-        "Employees' salaries",
-        "The vendor's share price"
+        "The model's full source code and parameter weights",
+        "Whether data trains models and how to object",
+        "The salaries of the data science team",
+        "The AI vendor's current share price"
        ],
        "answer": 1,
        "explain": "People need to know about training use and their options."
@@ -685,6 +836,101 @@ TRACK.modules.push({
      "title": "Privacy-enhancing technologies for AI"
     },
     {
+     "type": "topology",
+     "title": "Federated learning across three hospitals",
+     "nodes": [
+      {
+       "id": "agg",
+       "kind": "server",
+       "label": "Aggregator",
+       "sub": "Combines model updates",
+       "x": 3,
+       "y": 0
+      },
+      {
+       "id": "ha",
+       "kind": "server",
+       "label": "Hospital A",
+       "sub": "Trains locally",
+       "x": 0,
+       "y": 2
+      },
+      {
+       "id": "hb",
+       "kind": "server",
+       "label": "Hospital B",
+       "sub": "Trains locally",
+       "x": 3,
+       "y": 2
+      },
+      {
+       "id": "hc",
+       "kind": "server",
+       "label": "Hospital C",
+       "sub": "Trains locally",
+       "x": 6,
+       "y": 2
+      },
+      {
+       "id": "da",
+       "kind": "db",
+       "label": "Records A",
+       "sub": "Never leave site",
+       "x": 0,
+       "y": 3.5
+      },
+      {
+       "id": "db",
+       "kind": "db",
+       "label": "Records B",
+       "sub": "Never leave site",
+       "x": 3,
+       "y": 3.5
+      },
+      {
+       "id": "dc",
+       "kind": "db",
+       "label": "Records C",
+       "sub": "Never leave site",
+       "x": 6,
+       "y": 3.5
+      }
+     ],
+     "links": [
+      {
+       "a": "ha",
+       "b": "agg",
+       "label": "updates",
+       "style": "tunnel"
+      },
+      {
+       "a": "hb",
+       "b": "agg",
+       "label": "updates",
+       "style": "tunnel"
+      },
+      {
+       "a": "hc",
+       "b": "agg",
+       "label": "updates",
+       "style": "tunnel"
+      },
+      {
+       "a": "da",
+       "b": "ha"
+      },
+      {
+       "a": "db",
+       "b": "hb"
+      },
+      {
+       "a": "dc",
+       "b": "hc"
+      }
+     ],
+     "caption": "Raw records stay in each hospital; only model updates travel to the aggregator, which returns an improved shared model. Updates can still leak information, so they are often combined with secure aggregation or differential privacy."
+    },
+    {
      "type": "formula",
      "title": "Measures of privacy protection",
      "items": [
@@ -704,6 +950,46 @@ TRACK.modules.push({
        "meaning": "If only 3 people share a combination of age, area and job, each has about a one-in-three risk of being identified."
       }
      ]
+    },
+    {
+     "type": "chart",
+     "kind": "line",
+     "title": "Privacy versus accuracy",
+     "labels": [
+      "ε 0.1",
+      "ε 0.5",
+      "ε 1",
+      "ε 2",
+      "ε 5",
+      "ε 10"
+     ],
+     "series": [
+      {
+       "name": "Large group",
+       "values": [
+        71,
+        80,
+        85,
+        88,
+        90,
+        91
+       ]
+      },
+      {
+       "name": "Small group",
+       "values": [
+        55,
+        66,
+        74,
+        80,
+        85,
+        88
+       ]
+      }
+     ],
+     "unit": "%",
+     "yLabel": "Model accuracy",
+     "caption": "Illustrative numbers. Smaller epsilon means stronger privacy and more noise. Accuracy falls for everyone, but much faster for small groups, which can turn a privacy choice into a fairness problem."
     },
     {
      "type": "callout",
@@ -753,12 +1039,12 @@ TRACK.modules.push({
      "situation": "A Dhaka hospital wants to share three years of patient records with a university to develop a diabetes-risk model. What is the MOST appropriate approach?",
      "options": [
       {
-       "text": "Share the full records under a confidentiality agreement.",
+       "text": "Share the full records under a strict confidentiality agreement, since university researchers are bound by academic ethics and need complete data for accuracy.",
        "feedback": "Confidentiality helps but full identifiable records exceed what is needed and increase risk.",
        "best": false
       },
       {
-       "text": "Share pseudonymised, minimised fields needed for the research, under an agreement with security and use limits, after ethics and privacy review, and test re-identification risk.",
+       "text": "Share pseudonymised, minimised fields under an agreement with use limits, after ethics and privacy review and a re-identification test.",
        "feedback": "Best. It combines minimisation, pseudonymisation, contractual and ethical controls, and a re-identification check.",
        "best": true
       },
@@ -830,14 +1116,24 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "The best protection is not to use personal data; the next best is less data, in less identifiable form, strongly protected.",
+      "Pseudonymised data is still personal data, and true anonymisation is hard with rich behavioural or location data.",
+      "PETs such as differential privacy, federated learning, synthetic data and secure computation each trade privacy against accuracy, cost or complexity.",
+      "Minimise by design, and test re-identification and memorisation before any dataset or model is shared."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Pseudonymised data is usually:",
        "options": [
         "Still personal data under most laws",
-        "Outside all data protection law",
-        "Equivalent to public data",
+        "Outside the scope of all data protection law",
+        "Equivalent to public, freely usable data",
         "The same as encrypted backups"
        ],
        "answer": 0,
@@ -846,10 +1142,10 @@ TRACK.modules.push({
       {
        "q": "In differential privacy, a smaller epsilon means:",
        "options": [
-        "Weaker privacy",
-        "No effect on accuracy",
+        "Weaker privacy but higher accuracy",
+        "No effect on accuracy or privacy",
         "Stronger privacy and more noise",
-        "Faster training only"
+        "Faster training with the same output"
        ],
        "answer": 2,
        "explain": "Epsilon bounds how much one person's data can change outputs; smaller is more private."
@@ -857,8 +1153,8 @@ TRACK.modules.push({
       {
        "q": "Which technique trains across hospitals without pooling raw records?",
        "options": [
-        "Masking",
-        "k-anonymity",
+        "Masking of identifiers",
+        "k-anonymity grouping",
         "Data poisoning",
         "Federated learning"
        ],
@@ -879,10 +1175,10 @@ TRACK.modules.push({
       {
        "q": "Why can minimisation improve fairness?",
        "options": [
-        "It always increases accuracy",
-        "Fewer features means fewer proxies for protected traits",
-        "It removes the need to test",
-        "It hides results from regulators"
+        "It always increases the accuracy of the model",
+        "Fewer features leave fewer proxies",
+        "It removes the need for any fairness testing",
+        "It hides model results from regulators and auditors"
        ],
        "answer": 1,
        "explain": "Removing unnecessary features can reduce proxy discrimination."
@@ -917,7 +1213,7 @@ TRACK.modules.push({
      "rows": [
       [
        "Training on copyrighted works",
-       "Contested in courts in several countries; some decisions favour fair use or exceptions, others find infringement in specific circumstances",
+       "Contested in courts in several countries; decisions have gone different ways depending on the facts, and some disputes have ended in licensing deals or settlements",
        "Know your model provider's position; prefer providers offering documentation and IP indemnities"
       ],
       [
@@ -985,6 +1281,64 @@ TRACK.modules.push({
      "title": "The assistant that knew too much"
     },
     {
+     "type": "sequence",
+     "title": "Permission-aware retrieval",
+     "actors": [
+      "Intern",
+      "Assistant",
+      "Identity service",
+      "Search index",
+      "Language model"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "What are the salary bands?"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Who is this user? Which groups?"
+      },
+      {
+       "from": 2,
+       "to": 1,
+       "label": "Intern; groups: Operations",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 3,
+       "label": "Search, filtered to user's access"
+      },
+      {
+       "from": 3,
+       "to": 1,
+       "label": "No HR files (excluded from index)",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 4,
+       "label": "Question + permitted passages only"
+      },
+      {
+       "from": 4,
+       "to": 1,
+       "label": "Draft answer",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Public pay policy link; ask HR",
+       "reply": true
+      }
+     ],
+     "caption": "The permission check happens at query time, for this user, before anything reaches the model. Excluding HR folders from the index adds a second layer in case permissions on the source files are wrong."
+    },
+    {
      "type": "keypoints",
      "items": [
       "Classify what data may be entered into each approved tool (public, internal, confidential, personal, sensitive).",
@@ -1024,6 +1378,122 @@ TRACK.modules.push({
       ]
      ],
      "title": "Cross-border data: questions to answer"
+    },
+    {
+     "type": "topology",
+     "title": "Where generative-AI data travels",
+     "nodes": [
+      {
+       "id": "mdl",
+       "kind": "model",
+       "label": "Foundation model",
+       "sub": "Fourth party",
+       "x": 3,
+       "y": 0
+      },
+      {
+       "id": "bank",
+       "kind": "server",
+       "label": "Bank systems",
+       "sub": "Dhaka",
+       "x": 0,
+       "y": 2
+      },
+      {
+       "id": "api",
+       "kind": "api",
+       "label": "Vendor API",
+       "sub": "Hosted in region X",
+       "x": 3,
+       "y": 2
+      },
+      {
+       "id": "logs",
+       "kind": "storage",
+       "label": "Log storage",
+       "sub": "Region Y",
+       "x": 6,
+       "y": 2
+      },
+      {
+       "id": "staff",
+       "kind": "user",
+       "label": "Bank staff",
+       "x": 0,
+       "y": 4
+      },
+      {
+       "id": "sup",
+       "kind": "team",
+       "label": "Vendor support",
+       "sub": "Remote access, country Z",
+       "x": 6,
+       "y": 4
+      }
+     ],
+     "links": [
+      {
+       "a": "staff",
+       "b": "bank",
+       "label": "prompts"
+      },
+      {
+       "a": "bank",
+       "b": "api",
+       "label": "prompts, files"
+      },
+      {
+       "a": "api",
+       "b": "mdl",
+       "label": "inference"
+      },
+      {
+       "a": "api",
+       "b": "logs",
+       "label": "logs"
+      },
+      {
+       "a": "sup",
+       "b": "logs",
+       "label": "remote access",
+       "style": "dashed"
+      }
+     ],
+     "zones": [
+      {
+       "label": "Bangladesh",
+       "x": 0,
+       "y": 2,
+       "w": 1,
+       "h": 3,
+       "tone": "accent"
+      },
+      {
+       "label": "Region X",
+       "x": 2,
+       "y": 0,
+       "w": 2,
+       "h": 3,
+       "tone": "neutral"
+      },
+      {
+       "label": "Region Y",
+       "x": 5,
+       "y": 2,
+       "w": 2,
+       "h": 1,
+       "tone": "warn"
+      },
+      {
+       "label": "Country Z",
+       "x": 5,
+       "y": 4,
+       "w": 2,
+       "h": 1,
+       "tone": "warn"
+      }
+     ],
+     "caption": "Each arrow that crosses a boundary can be a cross-border transfer, including remote support access to logs. Ask where prompts are processed, where logs rest and who can reach them, and from where, before customer or regulated data enters the tool."
     },
     {
      "type": "template",
@@ -1073,12 +1543,12 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Allow it if staff remove customer names first.",
+       "text": "Allow it if staff first remove customer names, account numbers and addresses from each complaint, since a summary does not need to know who complained or where they live.",
        "feedback": "Removing names helps but complaints often contain account details and stories that identify people, and the training terms remain.",
        "best": false
       },
       {
-       "text": "Do not use the free tier for customer data; speed up the enterprise procurement and, meanwhile, allow only non-customer content or an approved internal tool.",
+       "text": "Keep customer data out of the free tier; speed up enterprise procurement and allow only non-customer content or an approved tool meanwhile.",
        "feedback": "Best. It prevents customer data from reaching a provider that may train on it, while supporting the team's need through a governed path.",
        "best": true
       },
@@ -1127,15 +1597,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Know what your model was trained on and on what terms; copyright and data-mining rules are still being settled in courts and legislation.",
+      "Publicly visible data is not automatically free to use for training.",
+      "Retrieval must enforce each user's permissions at query time, and indexes should include only approved sources.",
+      "Set contract terms on vendor training, retention and hosting, and treat prompt logs and remote access as data flows to govern."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "An internal assistant reveals confidential pay data to an intern. What is the root cause most likely to be?",
        "options": [
-        "The model is too small",
-        "Over-shared documents combined with retrieval that does not enforce permissions",
-        "The intern used the wrong language",
-        "The output was too long"
+        "The underlying language model is too small to judge context",
+        "Over-shared files and retrieval that ignores permissions",
+        "The intern asked in the wrong language for the system",
+        "The answer was too long and included extra detail"
        ],
        "answer": 1,
        "explain": "The assistant surfaces whatever it can retrieve; permission hygiene and checks are the control."
@@ -1143,10 +1623,10 @@ TRACK.modules.push({
       {
        "q": "Which contract term matters most before staff enter personal data into a vendor's assistant?",
        "options": [
-        "The colour scheme of the interface",
-        "The vendor's office location",
-        "Whether the vendor uses prompts and outputs to train its models",
-        "The number of languages supported"
+        "The colour scheme and branding of the chat interface",
+        "The city where the vendor's head office is located",
+        "Whether the vendor trains its models on your prompts",
+        "The number of languages the assistant supports"
        ],
        "answer": 2,
        "explain": "Training on inputs could expose data and conflicts with purpose limitation."
@@ -1154,10 +1634,10 @@ TRACK.modules.push({
       {
        "q": "Is purely machine-generated output always protected by copyright?",
        "options": [
-        "Yes, everywhere",
-        "Only in South Asia",
-        "Only for images",
-        "No; many jurisdictions require human authorship"
+        "Yes, everywhere, as soon as it is generated",
+        "Only in South Asian countries with new laws",
+        "Only for images, not for text or code",
+        "No; many places require human authorship"
        ],
        "answer": 3,
        "explain": "Human authorship requirements mean protection may be absent or limited."
@@ -1165,10 +1645,10 @@ TRACK.modules.push({
       {
        "q": "Why can remote support access by a foreign vendor matter?",
        "options": [
-        "Access from abroad can itself count as a cross-border transfer",
-        "It never matters if data is encrypted",
-        "It only matters for public data",
-        "Vendors are exempt from transfer rules"
+        "Access from abroad can itself be a transfer",
+        "It never matters if the data is encrypted at rest",
+        "It only matters for publicly available data",
+        "Vendors are always exempt from transfer rules"
        ],
        "answer": 0,
        "explain": "Many laws treat access from another country as a transfer."
@@ -1176,10 +1656,10 @@ TRACK.modules.push({
       {
        "q": "What is the main data risk of scraping public websites for training?",
        "options": [
-        "Public data is always free to use",
-        "Terms, copyright and data protection may still apply to publicly visible data",
-        "Scraped data is always accurate",
-        "Scraping makes models smaller"
+        "Public data is always free to use for any purpose",
+        "Terms, copyright and privacy law may still apply",
+        "Scraped data is always accurate and up to date",
+        "Scraping makes the resulting models smaller"
        ],
        "answer": 1,
        "explain": "Visibility does not equal permission to use."
@@ -1220,8 +1700,9 @@ TRACK.modules.push({
      "text": "Policies and risk registers mean little unless they shape what happens when a team designs, builds and releases an AI system. **Lifecycle governance** places control points, called stage gates, at the moments when decisions are cheapest to change. A design flaw caught at the idea stage costs a conversation; the same flaw caught after launch can cost a regulatory investigation."
     },
     {
-     "type": "flow",
+     "type": "cycle",
      "title": "The AI lifecycle",
+     "center": "Gates G1–G5 at key points",
      "items": [
       {
        "label": "Plan",
@@ -1251,7 +1732,8 @@ TRACK.modules.push({
        "label": "Retire",
        "text": "Decommission, data disposal, records"
       }
-     ]
+     ],
+     "caption": "Operation feeds back into planning: monitoring results, incidents and changes of purpose start a new turn of the loop, and retirement frees the problem for a better solution."
     },
     {
      "type": "table",
@@ -1330,6 +1812,61 @@ TRACK.modules.push({
      "title": "Effective challenge"
     },
     {
+     "type": "sequence",
+     "title": "A G3 pre-deployment gate",
+     "actors": [
+      "Model team",
+      "Validator",
+      "Governance office",
+      "Risk committee"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Model, data versions, test results"
+      },
+      {
+       "from": 1,
+       "to": 1,
+       "label": "Re-performs key tests; challenges"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Two findings to fix",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Fixes and re-test evidence"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Validation report: pass with conditions"
+      },
+      {
+       "from": 2,
+       "to": 3,
+       "label": "Gate pack: model card, bias, red team"
+      },
+      {
+       "from": 3,
+       "to": 2,
+       "label": "Approved: two weeks in shadow mode",
+       "reply": true
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "Record gate decision and conditions"
+      }
+     ],
+     "caption": "Effective challenge in practice: the validator can send work back, and the committee decides on evidence it did not produce. Conditions such as shadow mode are recorded so the post-launch review can check them."
+    },
+    {
      "type": "keypoints",
      "items": [
       "Decide what replaces the system's function and communicate the change.",
@@ -1346,12 +1883,12 @@ TRACK.modules.push({
      "situation": "A bank's data science team has a new fraud model ready. Validation is booked for three weeks' time, but the business wants to launch now because fraud losses are rising. What should the governance lead recommend?",
      "options": [
       {
-       "text": "Launch now and validate later, because the losses are real.",
+       "text": "Launch now and validate in three weeks as planned, because fraud losses are rising daily and the model already performed well in the data science team's own tests.",
        "feedback": "Launching a high-impact model without validation risks wrongly blocking legitimate customers at scale.",
        "best": false
       },
       {
-       "text": "Agree a time-boxed, risk-based expedited validation of the critical tests, launch in shadow or limited mode if needed, and record the exception with an owner and expiry.",
+       "text": "Agree a time-boxed expedited validation of critical tests, launch in shadow or limited mode if needed, and record the exception with an owner and expiry.",
        "feedback": "Best. It responds to the business need while keeping essential checks, limits exposure and documents a controlled exception.",
        "best": true
       },
@@ -1433,15 +1970,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Stage gates put control points where decisions are cheapest to change, from concept to post-launch review.",
+      "Publish gate criteria and evidence requirements in advance so well-prepared teams pass quickly.",
+      "High-risk models need independent validation and effective challenge, not only developer testing.",
+      "Retirement is a governed stage: archive records, revoke access, dispose of unneeded data and update the inventory."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Why place stage gates early in the lifecycle?",
        "options": [
-        "Regulators forbid late gates",
-        "Early gates remove the need for monitoring",
-        "Design flaws are cheapest to fix before build and launch",
-        "Data is always perfect early on"
+        "Regulators forbid any gates after launch",
+        "Early gates remove the need for monitoring later",
+        "Flaws are cheapest to fix before build and launch",
+        "Data quality is always perfect early in a project"
        ],
        "answer": 2,
        "explain": "Early decisions are easier and cheaper to change."
@@ -1449,10 +1996,10 @@ TRACK.modules.push({
       {
        "q": "Who should perform independent validation of a high-risk model?",
        "options": [
-        "The model's developers",
-        "The vendor's sales team",
-        "The end customer",
-        "People not involved in building it, with authority to challenge"
+        "The model's own developers, since they know it best",
+        "The vendor's sales and support team",
+        "The end customers who use the service",
+        "People independent of the build, able to challenge"
        ],
        "answer": 3,
        "explain": "Independence is the essential feature of validation."
@@ -1471,10 +2018,10 @@ TRACK.modules.push({
       {
        "q": "Which belongs in retirement?",
        "options": [
-        "Revoking keys and disposing of data no longer justified",
-        "Doubling the training data",
-        "Removing it from records without archive",
-        "Raising its risk tier"
+        "Revoking keys and disposing of unneeded data",
+        "Doubling the training data for a final version",
+        "Removing it from all records without any archive",
+        "Raising its risk tier before switching it off"
        ],
        "answer": 0,
        "explain": "Retirement closes access, archives records and disposes of unneeded data."
@@ -1482,9 +2029,9 @@ TRACK.modules.push({
       {
        "q": "An urgent launch needs a gate exception. What makes it controlled?",
        "options": [
-        "Verbal agreement in a corridor",
-        "No record to avoid blame",
-        "Permanent waiver",
+        "A verbal agreement with the governance lead",
+        "Keeping no written record so that nobody is blamed later",
+        "A permanent waiver for the whole product line",
         "A documented owner, conditions and an expiry date"
        ],
        "answer": 3,
@@ -1603,6 +2150,54 @@ TRACK.modules.push({
      "title": "Documentation that nobody can use"
     },
     {
+     "type": "tree",
+     "title": "A layered documentation set",
+     "root": {
+      "label": "High-risk AI system documentation",
+      "children": [
+       {
+        "label": "Decision-makers",
+        "children": [
+         {
+          "label": "One-page summary"
+         }
+        ]
+       },
+       {
+        "label": "Practitioners",
+        "children": [
+         {
+          "label": "Model card and datasheets"
+         },
+         {
+          "label": "Instructions for use"
+         }
+        ]
+       },
+       {
+        "label": "Regulators and auditors",
+        "children": [
+         {
+          "label": "Technical file"
+         },
+         {
+          "label": "Decision log and changes"
+         }
+        ]
+       },
+       {
+        "label": "Deployer's own records",
+        "children": [
+         {
+          "label": "Deployment record, local validation, impact assessment"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Each layer serves one audience, and all of them must tell the same story. Generating shared facts, such as data versions and metrics, from the pipeline keeps the layers consistent."
+    },
+    {
      "type": "template",
      "title": "Model card (summary)",
      "purpose": "Capture the essential facts about a model in a consistent format.",
@@ -1679,7 +2274,7 @@ TRACK.modules.push({
        "best": true
       },
       {
-       "text": "Write the missing sections yourself from the vendor's marketing material.",
+       "text": "Write the missing sections yourself from the vendor's marketing brochure and sales presentation, so the model card is complete before the contract is signed.",
        "feedback": "Marketing material is not evidence, and you would be inventing claims you cannot support.",
        "best": false
       },
@@ -1742,6 +2337,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Documentation turns governance into evidence for validators, deployers, auditors and regulators.",
+      "Model cards, datasheets, system cards, technical files, instructions for use and decision logs each serve a different audience.",
+      "Layer documentation so each audience gets what it can use, and keep the layers consistent.",
+      "Make documentation updates a release-gate condition, generate facts from pipelines and require vendor documentation by contract."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -1758,10 +2363,10 @@ TRACK.modules.push({
       {
        "q": "What is the main weakness of a model card showing only overall accuracy?",
        "options": [
-        "It is too short to print",
-        "It uses technical terms",
-        "It includes a version number",
-        "It hides performance differences between groups and known failure modes"
+        "It is too short to print in the annual report",
+        "It uses technical terms that customers may find hard to follow",
+        "It includes a version number that may change",
+        "It hides group differences and known failure modes"
        ],
        "answer": 3,
        "explain": "Group-level results and limitations are essential for judging fairness and fitness."
@@ -1769,10 +2374,10 @@ TRACK.modules.push({
       {
        "q": "Which is a deployer, rather than provider, document?",
        "options": [
-        "Local validation results and oversight arrangements",
-        "Training data description",
-        "Model architecture",
-        "Conformity evidence for the model"
+        "Local validation and oversight arrangements",
+        "A description of the original training data",
+        "The model architecture and design choices",
+        "Conformity evidence and declarations for the model"
        ],
        "answer": 0,
        "explain": "Deployers document how they use and oversee the system locally."
@@ -1780,10 +2385,10 @@ TRACK.modules.push({
       {
        "q": "How can documentation be kept current most reliably?",
        "options": [
-        "Update it every five years",
-        "Make updates a release-gate condition and generate parts automatically",
-        "Let anyone edit without review",
-        "Only update after incidents"
+        "Update it every five years during a major review",
+        "Tie updates to release gates and automate parts",
+        "Let anyone edit it freely without any review",
+        "Only update it after serious incidents"
        ],
        "answer": 1,
        "explain": "Linking documentation to releases and pipelines keeps it accurate."
@@ -1791,9 +2396,9 @@ TRACK.modules.push({
       {
        "q": "Why layer documentation for different audiences?",
        "options": [
-        "To hide information from regulators",
-        "To reduce testing",
-        "So each audience gets usable information while all versions stay consistent",
+        "To keep sensitive information away from regulators",
+        "To reduce the amount of testing needed",
+        "Each audience gets usable, consistent information",
         "Because regulators require exactly three layers"
        ],
        "answer": 2,
@@ -1898,15 +2503,40 @@ TRACK.modules.push({
      "title": "Evaluating generative AI"
     },
     {
-     "type": "flow",
-     "title": "A red-teaming exercise",
+     "type": "chart",
+     "kind": "bar",
+     "title": "A headline score can hide a language gap",
+     "labels": [
+      "Formal English",
+      "Bangla",
+      "Mixed Bangla-English",
+      "Regional dialect"
+     ],
+     "series": [
+      {
+       "name": "Correct triage",
+       "values": [
+        96,
+        89,
+        84,
+        71
+       ]
+      }
+     ],
+     "unit": "%",
+     "caption": "Illustrative numbers for a clinic-triage chatbot. A single overall score would average these away; reporting results by language shows where the system is not yet safe to use."
+    },
+    {
+     "type": "cycle",
+     "title": "The red-teaming loop",
+     "center": "Findings feed the regression suite",
      "items": [
       {
        "label": "Scope",
        "text": "System, risks to probe, rules of engagement"
       },
       {
-       "label": "Team",
+       "label": "Assemble team",
        "text": "Security, domain experts, diverse testers, affected-group perspectives"
       },
       {
@@ -1923,9 +2553,10 @@ TRACK.modules.push({
       },
       {
        "label": "Retest",
-       "text": "Confirm fixes and add cases to the regression suite"
+       "text": "Confirm fixes and add the cases to the regression suite"
       }
-     ]
+     ],
+     "caption": "Each retest adds the attack to the regression suite, so the next model, prompt or retrieval change is checked against everything found before. Repeat the loop after major changes, not only before launch."
     },
     {
      "type": "callout",
@@ -1961,12 +2592,12 @@ TRACK.modules.push({
      "situation": "A validation report for a clinic-triage chatbot shows 95% correct triage on 500 test conversations. You notice the test conversations were all written in formal English by the development team. The chatbot will serve patients in Bangla, English and mixed language. What should you require?",
      "options": [
       {
-       "text": "Accept the result; 95% on 500 cases is statistically strong.",
+       "text": "Accept the result, because 95% correct triage on 500 conversations is statistically strong and the team can add other languages after launch.",
        "feedback": "The sample is large but unrepresentative of real patients, so the result does not answer the right question.",
        "best": false
       },
       {
-       "text": "A new evaluation with realistic conversations from the intended population in Bangla, English and mixed language, reviewed by clinicians, with results by language.",
+       "text": "Re-evaluate with realistic conversations in Bangla, English and mixed language, reviewed by clinicians, with results reported by language.",
        "feedback": "Best. Validation must reflect the real population and context, and clinicians must judge triage correctness.",
        "best": true
       },
@@ -2056,6 +2687,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Evaluation asks whether a system is good enough for this purpose, these people and this context.",
+      "Pick metrics by the worst error: recall where misses hurt, precision and false-positive rate where false alarms hurt; accuracy misleads when events are rare.",
+      "Evaluate generative AI with representative golden sets, rubrics and expert reviewers, and re-run them after every change.",
+      "Red teams should be diverse, findings fixed and retested, and live evaluation run with safeguards."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -2083,10 +2724,10 @@ TRACK.modules.push({
       {
        "q": "Why can accuracy be misleading for fraud detection?",
        "options": [
-        "Accuracy is always lower than recall",
-        "Fraud is rare, so predicting 'no fraud' for everything scores highly",
-        "Accuracy cannot be computed for fraud",
-        "Fraud models have no errors"
+        "Accuracy is always lower than recall for fraud models",
+        "Fraud is rare, so 'no fraud' for everything scores well",
+        "Accuracy cannot be computed for fraud cases",
+        "Fraud models never make errors once they are deployed"
        ],
        "answer": 1,
        "explain": "Class imbalance makes accuracy a poor guide."
@@ -2094,10 +2735,10 @@ TRACK.modules.push({
       {
        "q": "What makes red teaming more effective?",
        "options": [
-        "Diverse testers, including people from affected communities",
-        "Only the original developers",
-        "Testing only with typical inputs",
-        "Skipping documentation of findings"
+        "Diverse testers, including affected communities",
+        "Only the original developers, who know the weak spots",
+        "Testing only with typical, everyday inputs",
+        "Skipping documentation so testing moves faster"
        ],
        "answer": 0,
        "explain": "Diverse perspectives find failures homogeneous teams miss."
@@ -2105,10 +2746,10 @@ TRACK.modules.push({
       {
        "q": "When should a generative-AI regression suite be re-run?",
        "options": [
-        "Once a year only",
-        "Only after a complaint",
+        "Once a year, during the annual model review cycle",
+        "Only after a customer complaint is received",
         "After every model, prompt or retrieval change",
-        "Never once launched"
+        "Never, once the system has been launched"
        ],
        "answer": 2,
        "explain": "Small changes can alter behaviour unexpectedly."
@@ -2173,6 +2814,42 @@ TRACK.modules.push({
      "kind": "example",
      "text": "Of 400 male applicants, 120 pass an AI screen (selection rate 0.30). Of 300 female applicants, 60 pass (0.20). The disparate impact ratio is 0.20 / 0.30 = 0.67, below the 0.8 warning level, and the demographic parity difference is 0.10. This does not prove unlawful discrimination, but it requires investigation of features, labels and alternatives before release.",
      "title": "Worked example: hiring screen"
+    },
+    {
+     "type": "chart",
+     "kind": "bar",
+     "title": "Selection rates against the four-fifths line",
+     "labels": [
+      "Men",
+      "Women",
+      "Urban",
+      "Rural",
+      "Rural women"
+     ],
+     "series": [
+      {
+       "name": "Selection rate",
+       "values": [
+        30,
+        20,
+        31,
+        24,
+        16
+       ]
+      },
+      {
+       "name": "80% of highest group's rate",
+       "values": [
+        24.8,
+        24.8,
+        24.8,
+        24.8,
+        24.8
+       ]
+      }
+     ],
+     "unit": "%",
+     "caption": "The men and women figures come from the worked example; the others are illustrative. Groups below the line warrant investigation, and intersections such as rural women can sit far below either parent group, which is why bias tests include them."
     },
     {
      "type": "cli",
@@ -2285,12 +2962,12 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Explore alternative features such as transaction history, test mitigation options with legal review, re-test, and add human review for borderline applications.",
+       "text": "Explore alternative features such as transaction history, test mitigations with legal review, re-test, and add human review of borderline cases.",
        "feedback": "Best. It addresses the cause, keeps the solution lawful, verifies the effect and adds a safeguard.",
        "best": true
       },
       {
-       "text": "Lower the approval threshold for everyone until the ratio passes.",
+       "text": "Lower the approval threshold for every applicant until the disparate impact ratio passes 0.8, then launch on schedule and monitor defaults closely.",
        "feedback": "This changes credit risk for all customers without addressing the cause and may create new problems.",
        "best": false
       }
@@ -2373,6 +3050,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "A bias test compares groups using metrics chosen for the harm, against thresholds agreed before results are seen.",
+      "Selection rate, disparate impact ratio, equal opportunity and false-positive rate differences answer different questions.",
+      "Test intersections, report sample sizes and uncertainty, and plan lawful access to protected attributes with the privacy officer.",
+      "Mitigate at the data, model, output or process stage, with legal review of the method."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -2400,10 +3087,10 @@ TRACK.modules.push({
       {
        "q": "Why should fairness thresholds be agreed before seeing results?",
        "options": [
-        "Because results are always good",
-        "Because regulators set every threshold",
-        "To save storage space",
-        "To avoid choosing thresholds that make results look acceptable after the fact"
+        "Because the results are almost always good anyway",
+        "Because regulators set every threshold in advance",
+        "To save storage space in the test reports",
+        "To stop thresholds being fitted to the results"
        ],
        "answer": 3,
        "explain": "Pre-agreement prevents motivated reasoning."
@@ -2422,10 +3109,10 @@ TRACK.modules.push({
       {
        "q": "Why report sample sizes with fairness results?",
        "options": [
-        "Small groups give unstable results that need cautious interpretation",
-        "To make reports longer",
-        "Because metrics need no context",
-        "To reveal identities"
+        "Small groups give unstable results",
+        "To make the reports look more thorough",
+        "Because metrics need no other context",
+        "To reveal who was in each group"
        ],
        "answer": 0,
        "explain": "Statistical uncertainty is high for small samples."
@@ -2520,6 +3207,52 @@ TRACK.modules.push({
      "title": "Explanation methods"
     },
     {
+     "type": "tree",
+     "title": "Matching the explanation to the audience",
+     "root": {
+      "label": "Who needs the explanation?",
+      "children": [
+       {
+        "label": "Affected individual",
+        "children": [
+         {
+          "label": "Local",
+          "text": "Reason codes and a counterfactual"
+         }
+        ]
+       },
+       {
+        "label": "Case reviewer",
+        "children": [
+         {
+          "label": "Local",
+          "text": "Top factors and data-quality flags"
+         }
+        ]
+       },
+       {
+        "label": "Validator or regulator",
+        "children": [
+         {
+          "label": "Global",
+          "text": "Feature importance, partial dependence, fidelity tests"
+         }
+        ]
+       },
+       {
+        "label": "Generative-AI user",
+        "children": [
+         {
+          "label": "Sources",
+          "text": "Citations, purpose and known limits"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Decide the audience first, then the method. Whatever the method, test it for fidelity and stability before it reaches people."
+    },
+    {
      "type": "callout",
      "kind": "insight",
      "text": "For many high-stakes decisions on structured data, such as credit and eligibility, interpretable models perform nearly as well as complex ones. An inherently interpretable model avoids the risk that a post-hoc explanation tells a story that differs from what the model actually does.",
@@ -2589,7 +3322,7 @@ TRACK.modules.push({
        "best": true
       },
       {
-       "text": "Add a disclaimer that explanations may not be accurate.",
+       "text": "Keep the dashboard but add a clear disclaimer to every explanation saying it may not reflect the model exactly, so customers are not misled about its reliability.",
        "feedback": "A disclaimer does not give people the real reasons they are entitled to.",
        "best": false
       },
@@ -2666,6 +3399,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Global explanations describe overall behaviour; local explanations give reasons for one output.",
+      "Prefer interpretable models for high-stakes structured decisions where they perform nearly as well.",
+      "Test explanation methods for fidelity, stability, comprehensibility, actionability and safety.",
+      "For generative AI, rely on citations, logs and plain-language limits, not the model's own account of its reasoning."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -2693,10 +3436,10 @@ TRACK.modules.push({
       {
        "q": "Why prefer interpretable models for many structured high-stakes decisions?",
        "options": [
-        "They are always more accurate",
-        "Regulators ban complex models",
-        "They often perform nearly as well and avoid unfaithful post-hoc stories",
-        "They need no testing"
+        "They are always more accurate than any complex model",
+        "Regulators ban complex models for credit decisions",
+        "They often perform almost as well and show real logic",
+        "They need no testing or validation before use"
        ],
        "answer": 2,
        "explain": "Interpretable models make the real logic visible."
@@ -2705,9 +3448,9 @@ TRACK.modules.push({
        "q": "Which is a good counterfactual explanation?",
        "options": [
         "Approval was likely with six more months of regular top-ups",
-        "You would be approved if you were younger",
-        "The model weights are confidential",
-        "Our AI decided"
+        "You would have been approved if you were five years younger",
+        "The model's weights are confidential and cannot be shared",
+        "Our automated system decided, so no reason is available"
        ],
        "answer": 0,
        "explain": "Good counterfactuals are actionable and avoid unchangeable traits."
@@ -2715,10 +3458,10 @@ TRACK.modules.push({
       {
        "q": "How should a generative model's self-described reasoning be treated?",
        "options": [
-        "As legal proof of its process",
-        "As identical to Shapley values",
-        "Not as a faithful account of how it produced the answer",
-        "As unnecessary to log"
+        "As legal proof of how it reached the answer",
+        "As equivalent to a Shapley-value explanation",
+        "Not as a faithful account of its process",
+        "As unnecessary to keep in the logs"
        ],
        "answer": 2,
        "explain": "Self-reports can diverge from the actual computation."
@@ -2810,6 +3553,72 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "chart",
+     "kind": "line",
+     "title": "PSI on 'average monthly top-up', week by week",
+     "labels": [
+      "W1",
+      "W2",
+      "W3",
+      "W4",
+      "W5",
+      "W6",
+      "W7",
+      "W8",
+      "W9",
+      "W10"
+     ],
+     "series": [
+      {
+       "name": "PSI",
+       "values": [
+        0.03,
+        0.04,
+        0.05,
+        0.04,
+        0.06,
+        0.12,
+        0.19,
+        0.27,
+        0.31,
+        0.3
+       ]
+      },
+      {
+       "name": "Moderate (0.1)",
+       "values": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1,
+        0.1
+       ]
+      },
+      {
+       "name": "Significant (0.25)",
+       "values": [
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25
+       ]
+      }
+     ],
+     "yLabel": "Population stability index",
+     "caption": "Illustrative values matching the scenario below: a stipend starts in week 6 and the shift crosses the significant threshold by week 8. An alert at the moderate level would have given the owner two extra weeks to investigate."
+    },
+    {
      "type": "table",
      "head": [
       "Area",
@@ -2857,8 +3666,9 @@ TRACK.modules.push({
      "title": "Monitor outcomes, not just models"
     },
     {
-     "type": "flow",
+     "type": "cycle",
      "title": "From alert to action",
+     "center": "Monitoring baseline",
      "items": [
       {
        "label": "Detect",
@@ -2884,7 +3694,8 @@ TRACK.modules.push({
        "label": "Record",
        "text": "Update model card, risk register and logs"
       }
-     ]
+     ],
+     "caption": "Recording closes the loop: the updated model card, risk register and thresholds become the baseline that the next round of monitoring compares against."
     },
     {
      "type": "table",
@@ -2924,17 +3735,17 @@ TRACK.modules.push({
      "situation": "A nano-loan model's PSI on 'average monthly top-up' rises to 0.31 after a new government stipend begins paying many rural households through mobile wallets. Approval rates in rural areas rise sharply. What should the model owner do FIRST?",
      "options": [
       {
-       "text": "Retrain immediately on the latest month of data.",
+       "text": "Retrain immediately on the latest month of data so the model reflects the new stipend payments, and push the update to production the same week.",
        "feedback": "Retraining on a short, unusual window may build in a temporary pattern and needs change control.",
        "best": false
       },
       {
-       "text": "Triage the alert: analyse whether stipend income changes repayment risk, check default early indicators and fairness metrics, and decide on adjustment through change control.",
+       "text": "Triage the alert: analyse whether stipend income changes repayment risk, check early default signals and fairness, then adjust through change control.",
        "feedback": "Best. A significant shift needs understanding before action. The change may be benign or risky, and any fix should go through tested change control.",
        "best": true
       },
       {
-       "text": "Ignore it, because higher approvals are good for business.",
+       "text": "Ignore it, because higher approval rates are good for business and the stipend means rural households now have more regular income to repay.",
        "feedback": "Unexamined shifts can lead to over-lending and later defaults, harming customers and the lender.",
        "best": false
       },
@@ -3019,6 +3830,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Launch starts the riskiest period: data drift, concept drift and silent upstream or vendor changes all degrade AI systems.",
+      "Monitor performance, fairness, data quality, safety, oversight and real-world outcomes, each with thresholds, owners and actions.",
+      "Triage alerts before acting, and route every fix through change control with testing.",
+      "Classify changes as minor, significant or substantial; changes of purpose or population go back through intake."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -3035,10 +3856,10 @@ TRACK.modules.push({
       {
        "q": "A PSI of 0.31 on a key feature usually indicates:",
        "options": [
-        "No change at all",
-        "A perfect model",
+        "No meaningful change in the inputs at all",
+        "A near-perfect model that needs no attention",
         "A significant shift needing investigation",
-        "An encryption failure"
+        "An encryption failure in the data pipeline"
        ],
        "answer": 2,
        "explain": "Above 0.25 is commonly treated as significant."
@@ -3047,9 +3868,9 @@ TRACK.modules.push({
        "q": "Which change should go back through intake and impact assessment?",
        "options": [
         "Using the model for a new population or purpose",
-        "Routine retraining with unchanged design",
-        "Fixing a typo in a dashboard",
-        "Rotating an API key"
+        "Routine monthly retraining with an unchanged design",
+        "Fixing a typo on the monitoring dashboard",
+        "Rotating an API key on the normal schedule"
        ],
        "answer": 0,
        "explain": "A change in purpose or population can change risk and legal role."
@@ -3057,10 +3878,10 @@ TRACK.modules.push({
       {
        "q": "Why pair model metrics with complaints and appeals?",
        "options": [
-        "Complaints replace all metrics",
-        "Real-world outcomes can worsen while model metrics look healthy",
-        "Model metrics are illegal",
-        "Appeals are always wrong"
+        "Complaints replace the need for all model metrics",
+        "Outcomes can worsen while model metrics look fine",
+        "Model metrics are unreliable and should be ignored",
+        "Appeals are usually wrong and can be discounted"
        ],
        "answer": 1,
        "explain": "Outcome signals catch problems metrics miss."
@@ -3068,10 +3889,10 @@ TRACK.modules.push({
       {
        "q": "What is the best defence against silent vendor model updates?",
        "options": [
-        "Version pinning, notice clauses and regression testing before switching",
-        "Trusting the vendor",
-        "Turning off monitoring",
-        "Using shorter prompts"
+        "Pinning, notice clauses and regression tests",
+        "Trusting the vendor's release notes for each update",
+        "Turning off monitoring during vendor updates",
+        "Using shorter prompts that are less sensitive"
        ],
        "answer": 0,
        "explain": "Contractual and technical controls make changes deliberate."
@@ -3224,6 +4045,72 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "text",
+     "text": "**Agents need rules of their own.** When a generative-AI tool can act, the use policy must also say which autonomy level each approved agent may run at, which tools and data it may reach, which actions always need human approval, what spending or volume limits apply and who can pause it. Connectors and plug-ins that give an assistant new powers should go through the same approval as a new system."
+    },
+    {
+     "type": "sequence",
+     "title": "An agent action with human approval",
+     "actors": [
+      "Requester",
+      "Agent",
+      "Tool gateway",
+      "Approver",
+      "Payment system"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Pay invoice INV-204 (BDT 380,000)"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Call payment tool"
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "Check scope: above agent's limit"
+      },
+      {
+       "from": 2,
+       "to": 3,
+       "label": "Approval request with invoice context"
+      },
+      {
+       "from": 3,
+       "to": 3,
+       "label": "Call-back check with supplier"
+      },
+      {
+       "from": 3,
+       "to": 2,
+       "label": "Approved",
+       "reply": true
+      },
+      {
+       "from": 2,
+       "to": 4,
+       "label": "Execute payment (logged)"
+      },
+      {
+       "from": 4,
+       "to": 1,
+       "label": "Confirmation ID",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Done; audit trail linked",
+       "reply": true
+      }
+     ],
+     "caption": "The agent never holds payment rights itself: a gateway enforces its scope and limits, routes larger actions to a person and logs everything. That design holds up against prompt injection far better than instructions written into the agent's prompt."
+    },
+    {
      "type": "callout",
      "kind": "warning",
      "text": "'The AI wrote it' is never a defence. If a lawyer files a brief with invented cases, a doctor signs an AI-drafted report with an error, or a marketer publishes infringing images, the person and the organisation remain responsible. Courts in several countries have sanctioned lawyers for citing non-existent cases generated by AI.",
@@ -3272,8 +4159,38 @@ TRACK.modules.push({
     {
      "type": "callout",
      "kind": "definition",
-     "text": "The knowledge and skills that let people use AI in an informed way and understand its opportunities, risks and possible harms. The EU AI Act has required providers and deployers to take measures to ensure sufficient AI literacy of their staff since February 2025; it is good practice everywhere.",
+     "text": "The knowledge and skills that let people use AI in an informed way and understand its opportunities, risks and possible harms. The EU AI Act has required providers and deployers to take measures to ensure sufficient AI literacy of their staff since February 2025; the November 2025 simplification proposals would change how this duty applies, so check the current text. Whatever the law says, literacy is what makes a use policy work.",
      "title": "AI literacy"
+    },
+    {
+     "type": "tree",
+     "title": "An AI literacy programme by audience",
+     "root": {
+      "label": "AI literacy programme",
+      "children": [
+       {
+        "label": "All staff",
+        "text": "How AI works and fails; the use policy"
+       },
+       {
+        "label": "Frequent users",
+        "text": "Verification, data rules, prompt hygiene"
+       },
+       {
+        "label": "Overseers of high-risk systems",
+        "text": "System limits, override duties, escalation"
+       },
+       {
+        "label": "Builders and buyers",
+        "text": "Testing, documentation, contract clauses"
+       },
+       {
+        "label": "Leaders and board",
+        "text": "Risk appetite, oversight questions, accountability"
+       }
+      ]
+     },
+     "caption": "Depth grows with responsibility. Record completion by role, because evidence of literacy is increasingly what regulators, auditors and customers ask for."
     },
     {
      "type": "scenario",
@@ -3286,17 +4203,17 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Verify every citation against authoritative sources before filing, correct the submission, and reinforce the rule that legal authorities must always be checked, with no-blame learning for the associate.",
+       "text": "Verify every citation against authoritative sources before filing, correct the submission and reinforce the checking rule, with no-blame learning.",
        "feedback": "Best. It prevents harm to the client and court, applies the human-review rule and turns a near-miss into learning.",
        "best": true
       },
       {
-       "text": "Ban the associate from using AI permanently.",
+       "text": "Ban the associate from using AI tools permanently and announce the ban to all staff, so that everyone understands how seriously the firm takes accuracy.",
        "feedback": "Punishment without addressing the training and process gap will not prevent recurrence and may drive hidden use.",
        "best": false
       },
       {
-       "text": "Ask the assistant whether the citations are real.",
+       "text": "Ask the assistant to confirm each citation is real and give a short summary of every case, then file once it has confirmed them all.",
        "feedback": "The tool may confidently confirm its own fabrication. Verification must use authoritative sources.",
        "best": false
       }
@@ -3372,15 +4289,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "A good generative-AI policy is short, specific and enabling: approved tools, data rules, permitted and prohibited uses, review, disclosure, IP and reporting.",
+      "A data-and-tool matrix tells people exactly which data may go into which tool; secrets never go into any.",
+      "Human review scales with impact, and the person using AI stays accountable for the result.",
+      "Agents need their own rules on autonomy, tools, limits and approvals, and role-based literacy training makes the whole policy work."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Which data should never be entered into any generative-AI tool?",
        "options": [
-        "Public press releases",
-        "Internal meeting agendas",
+        "Public press releases and news articles",
+        "Internal meeting agendas for routine meetings",
         "Passwords, keys and other secrets",
-        "Published research"
+        "Published academic research papers"
        ],
        "answer": 2,
        "explain": "Secrets must never be placed in prompts, whatever the tool."
@@ -3389,9 +4316,9 @@ TRACK.modules.push({
        "q": "Who is responsible for a report drafted with AI and sent to a client?",
        "options": [
         "The person who sent it and their organisation",
-        "The AI vendor alone",
-        "Nobody",
-        "The model itself"
+        "The AI vendor alone, as the tool's maker",
+        "Nobody, because the text was machine-generated",
+        "The model itself, as the actual author"
        ],
        "answer": 0,
        "explain": "Accountability stays with the human user and organisation."
@@ -3399,10 +4326,10 @@ TRACK.modules.push({
       {
        "q": "Why provide approved tools that are easy to use?",
        "options": [
-        "To increase licence costs",
-        "Good approved tools remove the reason to use unapproved ones",
-        "To avoid training",
-        "Because personal accounts are faster"
+        "To justify a larger licence budget for the IT team",
+        "They remove the reason to use unapproved tools",
+        "To avoid the need for any training",
+        "Because personal accounts are always faster to use"
        ],
        "answer": 1,
        "explain": "Usability is a control against shadow AI."
@@ -3421,7 +4348,7 @@ TRACK.modules.push({
       {
        "q": "What is the correct way to check an AI-generated legal citation?",
        "options": [
-        "Ask the same assistant",
+        "Ask the same assistant to confirm that it is real",
         "Check that it is formatted correctly",
         "Look it up in an authoritative legal source",
         "Assume it is right if the tool is approved"
@@ -3496,6 +4423,128 @@ TRACK.modules.push({
      "title": "AI-specific supplier risks"
     },
     {
+     "type": "topology",
+     "title": "The supply chain behind a call-centre analytics service",
+     "nodes": [
+      {
+       "id": "fm",
+       "kind": "model",
+       "label": "Foundation model",
+       "sub": "Undisclosed provider",
+       "x": 2,
+       "y": 1
+      },
+      {
+       "id": "cl",
+       "kind": "cloud",
+       "label": "Cloud host",
+       "sub": "Hosting region?",
+       "x": 4,
+       "y": 1
+      },
+      {
+       "id": "lab",
+       "kind": "team",
+       "label": "Review firm",
+       "sub": "Checks sample transcripts",
+       "x": 6,
+       "y": 1
+      },
+      {
+       "id": "ven",
+       "kind": "api",
+       "label": "Analytics vendor",
+       "sub": "Transcribes and scores",
+       "x": 4,
+       "y": 3
+      },
+      {
+       "id": "tel",
+       "kind": "process",
+       "label": "Telecom (you)",
+       "sub": "Deployer",
+       "x": 1,
+       "y": 3
+      },
+      {
+       "id": "cus",
+       "kind": "user",
+       "label": "Customers",
+       "sub": "Call recordings",
+       "x": 0,
+       "y": 5
+      },
+      {
+       "id": "agt",
+       "kind": "team",
+       "label": "Call agents",
+       "sub": "Scored by AI",
+       "x": 2,
+       "y": 5
+      }
+     ],
+     "links": [
+      {
+       "a": "cus",
+       "b": "tel",
+       "label": "calls"
+      },
+      {
+       "a": "agt",
+       "b": "tel",
+       "label": "scores"
+      },
+      {
+       "a": "tel",
+       "b": "ven",
+       "label": "recordings"
+      },
+      {
+       "a": "ven",
+       "b": "fm",
+       "label": "API calls"
+      },
+      {
+       "a": "ven",
+       "b": "cl",
+       "label": "hosting"
+      },
+      {
+       "a": "ven",
+       "b": "lab",
+       "label": "samples",
+       "style": "dashed"
+      }
+     ],
+     "zones": [
+      {
+       "label": "Fourth parties",
+       "x": 2,
+       "y": 1,
+       "w": 5,
+       "h": 1,
+       "tone": "warn"
+      },
+      {
+       "label": "Third party",
+       "x": 4,
+       "y": 3,
+       "w": 1,
+       "h": 1,
+       "tone": "neutral"
+      },
+      {
+       "label": "Your organisation",
+       "x": 0,
+       "y": 3,
+       "w": 3,
+       "h": 3,
+       "tone": "accent"
+      }
+     ],
+     "caption": "Your contract is with the vendor, yet customers' recordings reach companies you never signed with. Due diligence asks the vendor to disclose these fourth parties, where they process data and how changes will be notified."
+    },
+    {
      "type": "flow",
      "title": "AI procurement process",
      "items": [
@@ -3528,6 +4577,44 @@ TRACK.modules.push({
        "text": "Reviews, renewals, exit"
       }
      ]
+    },
+    {
+     "type": "matrix",
+     "title": "Sizing supplier due diligence",
+     "x": "Business criticality and dependency",
+     "y": "Data sensitivity and impact on people",
+     "quadrants": [
+      {
+       "title": "Deep privacy and fairness review",
+       "items": [
+        "Sensitive data, limited dependency",
+        "Example: a pilot HR screening tool"
+       ]
+      },
+      {
+       "title": "Full due diligence",
+       "items": [
+        "Questionnaire, local testing, AI clauses",
+        "Annual review and exit plan",
+        "Example: a credit-decisioning platform"
+       ]
+      },
+      {
+       "title": "Standard checks",
+       "items": [
+        "Security baseline and approved terms",
+        "Example: grammar help on public text"
+       ]
+      },
+      {
+       "title": "Resilience focus",
+       "items": [
+        "Continuity, version pinning, exit plan",
+        "Example: a route-optimisation engine"
+       ]
+      }
+     ],
+     "caption": "Triage the supplier before the questionnaire goes out, so effort matches risk. A supplier can move quadrant when your use of it changes, so repeat the triage at renewal."
     },
     {
      "type": "keypoints",
@@ -3643,7 +4730,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Trigger a renewal review: reassess due diligence for the model changes and hosting move, test current performance and fairness, and renegotiate gaps before renewing.",
+       "text": "Trigger a renewal review: reassess the model changes and hosting move, test current performance and fairness, and renegotiate gaps first.",
        "feedback": "Best. It uses renewal as a control point to bring oversight up to date and fix gaps while leverage exists.",
        "best": true
       },
@@ -3653,7 +4740,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Ask the vendor to confirm in an email that nothing important has changed.",
+       "text": "Ask the vendor's account manager to confirm in writing that nothing important has changed, and renew if the confirmation arrives before the deadline.",
        "feedback": "Self-attestation without evidence is weak, especially after known material changes.",
        "best": false
       }
@@ -3701,6 +4788,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Buying AI brings in a supplier's design choices and weaknesses while accountability stays with you.",
+      "Size due diligence to data sensitivity, impact and dependency, and test locally on your own data before signing.",
+      "Negotiate AI-specific clauses: data use, documentation, change notice, performance and fairness, audit, incidents, IP, roles and exit.",
+      "Know your fourth parties and open-weight licence terms, and use renewals to bring oversight up to date."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -3717,10 +4814,10 @@ TRACK.modules.push({
       {
        "q": "Which clause most directly prevents your customer data from improving a vendor's models?",
        "options": [
-        "Exit clause",
-        "Data use clause prohibiting training on customer data",
-        "Payment terms",
-        "Governing law"
+        "Exit and transition clause at contract end",
+        "A clause banning training on your data",
+        "Payment terms and invoicing schedule",
+        "Governing law and dispute resolution clause"
        ],
        "answer": 1,
        "explain": "Data use terms control training on your data."
@@ -3742,7 +4839,7 @@ TRACK.modules.push({
         "Data minimisation",
         "Interpretability",
         "Concentration risk",
-        "Overfitting"
+        "Overfitting of the provider's model"
        ],
        "answer": 2,
        "explain": "Failure or change at one provider affects everything that depends on it."
@@ -3750,10 +4847,10 @@ TRACK.modules.push({
       {
        "q": "What should you check before deploying an open-weight model?",
        "options": [
-        "Nothing, because it is free",
-        "Only its download speed",
-        "Only its popularity",
-        "Licence terms, documentation, vulnerabilities and file provenance"
+        "Nothing, because it is free and downloaded by millions",
+        "Only how fast it downloads and runs",
+        "Only its popularity on public leaderboards",
+        "Licence, documentation, vulnerabilities, provenance"
        ],
        "answer": 3,
        "explain": "Open-weight models carry supplier-type risks and licence conditions."
@@ -3896,6 +4993,61 @@ TRACK.modules.push({
      "title": "Reporting duties that may apply (summarised, as of 2026)"
     },
     {
+     "type": "sequence",
+     "title": "Escalating a serious incident with a high-risk system",
+     "actors": [
+      "Operations",
+      "Incident lead",
+      "Provider",
+      "AI Act authority",
+      "Data protection authority"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Alert: wrongful refusals spike"
+      },
+      {
+       "from": 1,
+       "to": 1,
+       "label": "Triage SEV1; pause or roll back"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Inform provider immediately"
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "Investigate; establish likely link"
+      },
+      {
+       "from": 2,
+       "to": 3,
+       "label": "Serious-incident report (15-day limit)"
+      },
+      {
+       "from": 1,
+       "to": 4,
+       "label": "Breach notice if data exposed (72 h)"
+      },
+      {
+       "from": 3,
+       "to": 2,
+       "label": "Follow-up and corrective measures",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 1,
+       "label": "Remediate; post-incident review"
+      }
+     ],
+     "caption": "Two clocks can run at once: the AI Act's serious-incident timeline for the provider (shorter for deaths and critical infrastructure) and data protection breach deadlines. Both usually start from awareness, so the legal check starts on day one. The Commission has consulted on guidance and a reporting template; use the current version."
+    },
+    {
      "type": "callout",
      "kind": "warning",
      "text": "Reporting deadlines can start when you become aware of an incident, not when you finish investigating. Map every applicable duty for each high-risk system in advance, with the contact point and template, so the incident team does not lose days working it out. This summary is not legal advice; confirm duties with counsel.",
@@ -3949,7 +5101,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Activate the incident process: the on-call lead classifies it as high severity, disables the affected feature, preserves logs and engages privacy and communications teams to assess notification duties.",
+       "text": "Activate the incident process: the on-call lead rates it high severity, disables the feature, preserves logs and brings in privacy and communications.",
        "feedback": "Best. It contains harm, preserves evidence and starts the legal assessment promptly, regardless of who is on leave.",
        "best": true
       },
@@ -3959,7 +5111,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Publicly deny the issue until the investigation is complete.",
+       "text": "Publicly state that customer data is safe and that the post is being investigated, then correct the statement later if the investigation finds a problem.",
        "feedback": "Denying before facts are known can mislead the public and regulators and damage trust further.",
        "best": false
       }
@@ -4047,15 +5199,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Define AI incidents and near-misses broadly, including harms that are not security breaches, and record both.",
+      "Severity levels set who leads and how fast; containment comes first, with evidence preserved.",
+      "Reporting clocks often start at awareness: map duties per system and jurisdiction before you need them.",
+      "Write and rehearse playbooks for common generative-AI incidents, and turn every incident into new tests and controls."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "A reviewer catches a fabricated citation before a document is sent. This should be:",
        "options": [
         "Recorded as a near-miss for learning",
-        "Ignored because no harm occurred",
-        "Reported to the police",
-        "Treated as a SEV1 incident"
+        "Ignored, because no harm actually occurred",
+        "Reported to the police as attempted fraud",
+        "Treated as a SEV1 incident with an executive lead"
        ],
        "answer": 0,
        "explain": "Near-misses reveal weaknesses before they cause harm."
@@ -4063,10 +5225,10 @@ TRACK.modules.push({
       {
        "q": "Under the EU AI Act, what is the outer limit for a provider to report most serious incidents?",
        "options": [
-        "One year",
+        "One year after the incident",
         "15 days after becoming aware",
-        "No limit",
-        "90 days"
+        "90 days after the investigation ends",
+        "No limit, if the provider is investigating"
        ],
        "answer": 1,
        "explain": "The general deadline is 15 days, with shorter limits for the most serious cases."
@@ -4085,10 +5247,10 @@ TRACK.modules.push({
       {
        "q": "Why map reporting duties before incidents happen?",
        "options": [
-        "Regulators require maps to be published",
-        "Maps replace containment",
-        "Deadlines may start on awareness, leaving little time to research during a crisis",
-        "Duties never change"
+        "Regulators require such maps to be published online",
+        "Duty maps replace the need for fast containment",
+        "Clocks can start at awareness, leaving little time",
+        "Reporting duties never change once they are mapped"
        ],
        "answer": 2,
        "explain": "Preparation avoids missing short statutory deadlines."
@@ -4096,10 +5258,10 @@ TRACK.modules.push({
       {
        "q": "What is the best control against deepfake payment fraud?",
        "options": [
-        "Call-back verification through a known independent channel",
-        "Better video quality",
-        "Longer meetings",
-        "Faster payment processing"
+        "Call-back on a known, independent channel",
+        "Better video quality for all video calls",
+        "Longer meetings before approving payments",
+        "Faster payment processing so fraud is spotted sooner"
        ],
        "answer": 0,
        "explain": "Independent verification defeats convincing impersonation."
@@ -4308,6 +5470,43 @@ TRACK.modules.push({
      "title": "Evidence for common AI controls"
     },
     {
+     "type": "matrix",
+     "title": "Design versus operating effectiveness",
+     "x": "Operating effectiveness",
+     "y": "Design effectiveness",
+     "quadrants": [
+      {
+       "title": "Well designed, not followed",
+       "items": [
+        "Example: assessments approved after launch",
+        "Fix: enforce the gate in the pipeline"
+       ]
+      },
+      {
+       "title": "Effective control",
+       "items": [
+        "Designed to policy and evidenced in samples",
+        "Retest in the next audit cycle"
+       ]
+      },
+      {
+       "title": "Missing or broken",
+       "items": [
+        "Example: no bias-testing requirement for hiring tools",
+        "Fix: redesign the control"
+       ]
+      },
+      {
+       "title": "Works by habit, not design",
+       "items": [
+        "People do the right thing without a written control",
+        "Fix: formalise before staff change"
+       ]
+      }
+     ],
+     "caption": "Auditors test design first, then operation. The rating and the fix differ by quadrant, which is why every finding should say which kind of failure was found."
+    },
+    {
      "type": "callout",
      "kind": "warning",
      "text": "Auditors must be able to question data scientists, read model documentation, understand metrics and recognise when a test set is unrepresentative. Build skills through training, co-sourcing specialists and pairing auditors with independent technical experts. Independence still matters: experts who built a system should not audit it.",
@@ -4330,12 +5529,12 @@ TRACK.modules.push({
      "situation": "The head of data science asks internal audit to limit its AI audit to model accuracy, saying governance processes are 'just paperwork'. What should the chief audit executive do?",
      "options": [
       {
-       "text": "Agree, because data scientists know the models best.",
+       "text": "Agree to focus on model accuracy, because the data scientists know the models best and governance processes can be reviewed in a later audit cycle.",
        "feedback": "Audit scope is set independently based on risk; limiting it to accuracy would miss governance failures that cause most harm.",
        "best": false
       },
       {
-       "text": "Set scope based on risk, covering governance, intake, assessments, fairness, oversight, monitoring and suppliers, while drawing on data-science expertise for technical testing.",
+       "text": "Set scope by risk, covering governance, intake, assessments, fairness, oversight, monitoring and suppliers, using data-science expertise for testing.",
        "feedback": "Best. Independence and risk-based scoping are core audit principles; technical expertise supports but does not set scope.",
        "best": true
       },
@@ -4419,6 +5618,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Assurance gives independent, evidence-based conclusions on whether AI governance works; it tests management rather than replacing it.",
+      "The three lines model places owners first, risk and compliance second and internal audit third, with the board overseeing all three.",
+      "Assurance types conclude different things: second-line reviews, internal and external audits, certification, bias audits and conformity assessment.",
+      "Audits need risk-based scope, explicit criteria and tests of both design and operating effectiveness, performed independently."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -4446,10 +5655,10 @@ TRACK.modules.push({
       {
        "q": "What does ISO/IEC 42001 certification conclude?",
        "options": [
-        "A management system conforms to the standard within scope",
-        "Each model is accurate",
-        "The organisation can ignore law",
-        "All suppliers are compliant"
+        "Its management system conforms within scope",
+        "Each of its AI models is accurate and free of bias",
+        "The organisation may now ignore AI-specific laws",
+        "All of its AI suppliers are fully compliant too"
        ],
        "answer": 0,
        "explain": "Certification addresses the management system, not every model's quality or legality."
@@ -4457,10 +5666,10 @@ TRACK.modules.push({
       {
        "q": "A control is well designed but often skipped. It lacks:",
        "options": [
-        "Design effectiveness",
+        "Design effectiveness of the control",
         "Operating effectiveness",
-        "Documentation only",
-        "Independence"
+        "Documentation of the procedure only",
+        "Independence of the reviewer"
        ],
        "answer": 1,
        "explain": "It would work if operated, but it is not operating consistently."
@@ -4571,6 +5780,51 @@ TRACK.modules.push({
        "text": "Ethics advisers or external panels, including affected-community perspectives, for difficult cases."
       }
      ]
+    },
+    {
+     "type": "tree",
+     "title": "An AI governance structure (example)",
+     "root": {
+      "label": "Board",
+      "text": "Approves principles and risk appetite",
+      "children": [
+       {
+        "label": "Risk or audit committee",
+        "text": "Oversight; receives assurance",
+        "children": [
+         {
+          "label": "Internal audit",
+          "text": "Third line, independent"
+         }
+        ]
+       },
+       {
+        "label": "Executive sponsor",
+        "text": "Accountable for the programme",
+        "children": [
+         {
+          "label": "AI governance committee",
+          "text": "Approves high-risk systems and exceptions",
+          "children": [
+           {
+            "label": "AI governance office"
+           },
+           {
+            "label": "System owners"
+           },
+           {
+            "label": "Expert functions"
+           },
+           {
+            "label": "AI champions"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Decision rights follow the lines: the committee approves, pauses and retires high-risk systems, owners run them, and internal audit reports independently. Champions and expert functions carry the rules into daily work."
     },
     {
      "type": "callout",
@@ -4687,35 +5941,41 @@ TRACK.modules.push({
      ]
     },
     {
-     "type": "table",
-     "head": [
-      "Quarter",
-      "Focus",
-      "Key deliverables"
+     "type": "timeline",
+     "title": "Year-one roadmap (example)",
+     "items": [
+      {
+       "when": "Days 1–30",
+       "label": "Find the AI",
+       "text": "Sponsor agreed; inventory sprint; interim rules and prohibited-use list"
+      },
+      {
+       "when": "Days 31–60",
+       "label": "Open the front door",
+       "text": "Intake and tiering; acceptable-use rule for generative AI"
+      },
+      {
+       "when": "Days 61–90",
+       "label": "Tackle top risks",
+       "text": "Assess the highest-risk systems; charter the committee; first board report"
+      },
+      {
+       "when": "Q2",
+       "label": "Policy and process",
+       "text": "Approved AI policy and standards, impact assessment template, supplier questionnaire, training launch"
+      },
+      {
+       "when": "Q3",
+       "label": "Lifecycle controls",
+       "text": "Stage gates, model cards, bias testing standard, monitoring for high-risk systems, incident playbooks"
+      },
+      {
+       "when": "Q4",
+       "label": "Assurance and maturity",
+       "text": "Metrics dashboard, first internal audit, maturity assessment, year-two plan, certification readiness review if relevant"
+      }
      ],
-     "rows": [
-      [
-       "Q1",
-       "Visibility and quick wins",
-       "Inventory, interim policy, intake, generative-AI rules, top-risk assessments"
-      ],
-      [
-       "Q2",
-       "Policy and process",
-       "Approved AI policy and standards, impact assessment template, supplier questionnaire, training launch"
-      ],
-      [
-       "Q3",
-       "Lifecycle controls",
-       "Stage gates, model cards, bias testing standard, monitoring for high-risk systems, incident playbooks"
-      ],
-      [
-       "Q4",
-       "Assurance and maturity",
-       "Metrics dashboard, first internal audit, maturity assessment, year-two plan, certification readiness review if relevant"
-      ]
-     ],
-     "title": "Year-one roadmap (example)"
+     "caption": "Visibility comes first, controls follow risk and assurance closes the year. Adjust the pace to your size, but keep the order."
     },
     {
      "type": "scenario",
@@ -4723,12 +5983,12 @@ TRACK.modules.push({
      "situation": "A large university group in South Asia is creating its AI governance programme. The IT director wants it inside IT; the registrar wants it in academic affairs; legal wants it in compliance. What is the BEST approach?",
      "options": [
       {
-       "text": "Place it in IT, because AI is technology.",
+       "text": "Place it in IT straight away, because AI is a technology, IT already manages the systems and the IT director has the budget and staff to run it.",
        "feedback": "AI governance spans academic, legal, ethical and operational questions; placing it inside the technology delivery function weakens challenge.",
        "best": false
       },
       {
-       "text": "Create a hub-and-spoke model with a small central office reporting to a senior executive outside IT delivery, a cross-functional committee and champions in faculties and departments.",
+       "text": "Create a hub and spoke: a small central office reporting outside IT delivery, a cross-functional committee and champions in faculties.",
        "feedback": "Best. It gives independence, cross-functional input and reach into faculties where AI is used.",
        "best": true
       },
@@ -4786,6 +6046,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Build the programme on what already works (privacy, security, model risk, procurement) and add the AI-specific pieces.",
+      "Hub and spoke balances consistent standards with reach into business units; pure centralisation becomes a bottleneck.",
+      "Clear decision rights to approve, block, pause and retire systems matter more than job titles.",
+      "Start with visibility: inventory, minimum rules, a front door and the top risks in the first 90 days."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -4802,10 +6072,10 @@ TRACK.modules.push({
       {
        "q": "What matters most about a senior AI governance role?",
        "options": [
-        "Clear decision rights to approve, block, pause and retire systems",
-        "The exact job title",
-        "The size of the office",
-        "Reporting to IT delivery"
+        "Clear rights to approve, block, pause and retire",
+        "An exact, widely recognised job title for the role",
+        "The size of the office the role leads",
+        "Reporting to the IT delivery function"
        ],
        "answer": 0,
        "explain": "Authority and information enable effective governance."
@@ -4813,9 +6083,9 @@ TRACK.modules.push({
       {
        "q": "Which is a sensible first-90-days action?",
        "options": [
-        "Pursuing certification immediately",
-        "Writing a 100-page policy",
-        "Banning all AI",
+        "Pursuing ISO/IEC 42001 certification immediately",
+        "Writing a comprehensive 100-page AI policy",
+        "Banning all AI use until the programme is fully ready",
         "An inventory sprint to find the AI already in use"
        ],
        "answer": 3,
@@ -4824,9 +6094,9 @@ TRACK.modules.push({
       {
        "q": "Why integrate AI governance with privacy, security and procurement?",
        "options": [
-        "Because AI needs no new controls",
-        "To hide AI risks",
-        "To reuse working processes and avoid duplicate, conflicting requirements",
+        "Because AI needs no new controls beyond existing ones",
+        "To hide AI risks from the board",
+        "To reuse working processes and avoid conflicts",
         "Because regulators forbid separate AI teams"
        ],
        "answer": 2,
@@ -4836,9 +6106,9 @@ TRACK.modules.push({
        "q": "Who approves the organisation's AI principles and risk appetite?",
        "options": [
         "The board or a board committee",
-        "Each data scientist",
-        "The vendor",
-        "Interns"
+        "Each data scientist for their own models",
+        "The main AI vendor",
+        "The newest members of staff"
        ],
        "answer": 0,
        "explain": "Direction-setting belongs to the governing body."
@@ -4949,10 +6219,90 @@ TRACK.modules.push({
      "title": "A balanced AI dashboard"
     },
     {
+     "type": "chart",
+     "kind": "line",
+     "title": "Control health over six quarters",
+     "labels": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      "Q5",
+      "Q6"
+     ],
+     "series": [
+      {
+       "name": "Inventory coverage",
+       "values": [
+        55,
+        68,
+        77,
+        84,
+        90,
+        94
+       ]
+      },
+      {
+       "name": "High-tier assessments current",
+       "values": [
+        40,
+        62,
+        75,
+        89,
+        95,
+        100
+       ]
+      }
+     ],
+     "unit": "%",
+     "caption": "Illustrative numbers. Trends tell a board more than a single quarter: both measures are improving, but coverage below 100% still means some AI reached production outside the front door."
+    },
+    {
      "type": "callout",
      "kind": "warning",
      "text": "A dashboard where everything is always green usually means the wrong things are measured or thresholds are too loose. Include at least one metric that would reveal trouble early, such as the number of AI systems discovered outside the intake process, and explain every amber or red honestly.",
      "title": "Green dashboards can mislead"
+    },
+    {
+     "type": "chart",
+     "kind": "bar",
+     "title": "AI incidents by severity",
+     "labels": [
+      "Q3",
+      "Q4",
+      "Q5",
+      "Q6"
+     ],
+     "series": [
+      {
+       "name": "SEV1-2",
+       "values": [
+        2,
+        4,
+        1,
+        1
+       ]
+      },
+      {
+       "name": "SEV3",
+       "values": [
+        5,
+        4,
+        3,
+        2
+       ]
+      },
+      {
+       "name": "Near-misses (SEV4)",
+       "values": [
+        6,
+        9,
+        14,
+        18
+       ]
+      }
+     ],
+     "caption": "Illustrative numbers. More near-miss reports alongside fewer serious incidents is usually a healthy sign: people report earlier and controls catch problems before harm."
     },
     {
      "type": "framework",
@@ -5021,12 +6371,12 @@ TRACK.modules.push({
      "situation": "The AI governance office's quarterly board pack is 48 pages of model metrics. Board members ask questions mainly about a newspaper story on AI hiring bias in another company. What should the AI governance lead change?",
      "options": [
       {
-       "text": "Add more model metrics so the board has complete data.",
+       "text": "Add more model metrics and a technical glossary so the board has complete data and can follow every detail of how each AI system is performing each quarter.",
        "feedback": "More technical data increases the burden without answering the board's real questions.",
        "best": false
       },
       {
-       "text": "Restructure the report around the board's questions: a one-page headline with decisions, top risk themes, a balanced dashboard and a short note on whether a similar hiring risk exists here, with detail in appendices.",
+       "text": "Rebuild it around the board's questions: a one-page headline with decisions, top risks, a balanced dashboard and a note on whether the hiring risk exists here.",
        "feedback": "Best. It makes the report decision-ready and addresses the board's concern directly, keeping detail available.",
        "best": true
       },
@@ -5095,14 +6445,24 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Boards oversee the use of AI; they need clear, honest, decision-ready information rather than raw model metrics.",
+      "A balanced dashboard covers value, exposure, control health, outcomes, incidents and readiness.",
+      "Include leading indicators, such as AI found outside the intake process, and explain every amber and red.",
+      "Lead with a short headline and the decisions needed, and put detail in appendices."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "What do boards need most from AI reporting?",
        "options": [
-        "Every model's raw metrics",
-        "Source code samples",
-        "Vendor marketing material",
+        "Every model's raw performance metrics each month",
+        "Samples of source code from key systems",
+        "The vendors' own marketing material",
         "Clear, honest, decision-ready information"
        ],
        "answer": 3,
@@ -5122,10 +6482,10 @@ TRACK.modules.push({
       {
        "q": "Why include a metric such as 'AI systems found outside the intake process'?",
        "options": [
-        "It always looks good",
-        "It replaces audits",
+        "It always looks good in the board pack",
+        "It replaces the need for internal audits",
         "It reveals governance weaknesses early",
-        "It measures model accuracy"
+        "It measures the accuracy of each model"
        ],
        "answer": 2,
        "explain": "It is a leading indicator of control failure."
@@ -5134,9 +6494,9 @@ TRACK.modules.push({
        "q": "What should come first in a board AI report?",
        "options": [
         "A short headline with status and decisions needed",
-        "A glossary",
-        "Appendix of model metrics",
-        "Vendor list"
+        "A glossary of technical AI terms",
+        "A full appendix of detailed metrics for every model",
+        "A list of all AI vendors and contract values"
        ],
        "answer": 0,
        "explain": "Leading with status and decisions focuses board time."
@@ -5215,8 +6575,54 @@ TRACK.modules.push({
      "title": "Assess by layer, not just overall"
     },
     {
-     "type": "flow",
-     "title": "Continuous improvement cycle",
+     "type": "chart",
+     "kind": "bar",
+     "title": "Maturity profile by ZAIG layer",
+     "labels": [
+      "Foundations",
+      "Principles",
+      "Regulation",
+      "Risk",
+      "Data",
+      "Lifecycle",
+      "Operations",
+      "Assurance"
+     ],
+     "series": [
+      {
+       "name": "Current level",
+       "values": [
+        4,
+        3,
+        3,
+        3,
+        2,
+        2,
+        2,
+        1
+       ]
+      },
+      {
+       "name": "Year-two target",
+       "values": [
+        4,
+        4,
+        4,
+        4,
+        3,
+        3,
+        3,
+        3
+       ]
+      }
+     ],
+     "yLabel": "Maturity level (1-5)",
+     "caption": "Figures from the case later in this lesson (a fictional organisation). Plotting current against target by layer makes the priorities obvious: the gaps are widest in Assurance and the operational layers."
+    },
+    {
+     "type": "cycle",
+     "title": "Continuous improvement (plan-do-check-act)",
+     "center": "Updated for new technology, law and strategy",
      "items": [
       {
        "label": "Plan",
@@ -5233,12 +6639,9 @@ TRACK.modules.push({
       {
        "label": "Act",
        "text": "Correct nonconformities and improve"
-      },
-      {
-       "label": "Repeat",
-       "text": "Update for new technology, law and strategy"
       }
-     ]
+     ],
+     "caption": "The same loop as the management system standard in Module 3. Each turn should leave the programme measurably better, fed by the improvement sources listed below."
     },
     {
      "type": "keypoints",
@@ -5268,11 +6671,11 @@ TRACK.modules.push({
      "rows": [
       [
        "Agentic AI",
-       "Systems that take actions raise questions of authority, permissions, liability and monitoring"
+       "Systems that take actions raise questions of autonomy levels, tool permissions, liability and monitoring; standard ways of connecting agents to tools are spreading fast"
       ],
       [
        "Frontier model safety",
-       "Evaluations and incident reporting for the most capable models continue to develop"
+       "Evaluations, codes of practice and incident reporting for the most capable models continue to develop"
       ],
       [
        "Content provenance",
@@ -5289,6 +6692,10 @@ TRACK.modules.push({
       [
        "Workforce effects",
        "AI's impact on jobs, skills and worker monitoring draws regulatory and social attention"
+      ],
+      [
+       "AI incident reporting",
+       "Mandatory reporting duties and shared incident databases are maturing, raising expectations for detection and disclosure"
       ]
      ],
      "title": "Emerging topics to watch (as of 2026)"
@@ -5310,17 +6717,17 @@ TRACK.modules.push({
      "situation": "Two years in, an AI governance programme's metrics are all green, but staff describe the intake as a box-ticking exercise and two recent AI problems were found by journalists, not by internal controls. What should the AI governance lead do?",
      "options": [
       {
-       "text": "Celebrate the green metrics in the next board report.",
+       "text": "Celebrate the green metrics in the next board report and explain that the two press stories involved minor issues the controls would have caught eventually.",
        "feedback": "Green metrics alongside externally discovered problems suggest the metrics measure activity, not effectiveness.",
        "best": false
       },
       {
-       "text": "Commission an honest review: test controls' effectiveness, interview staff, analyse the two problems' root causes, revise metrics to include leading indicators and refresh the culture and training.",
+       "text": "Commission an honest review: test control effectiveness, interview staff, find the two problems' root causes, add leading indicators and refresh training.",
        "feedback": "Best. It confronts the gap between reported and real performance and rebuilds effectiveness and trust.",
        "best": true
       },
       {
-       "text": "Add more mandatory fields to the intake form.",
+       "text": "Add more mandatory fields and a second sign-off to the intake form, so every AI use case is documented in far greater detail before approval.",
        "feedback": "More bureaucracy is likely to deepen box-ticking rather than fix effectiveness.",
        "best": false
       },
@@ -5397,6 +6804,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "AI governance is never finished; mature programmes build the ability to learn and adapt.",
+      "Assess maturity layer by layer; the weakest layers show where to invest next.",
+      "Plan-do-check-act, fed by incidents, audits, monitoring, complaints and regulatory change, drives improvement.",
+      "Culture is the last control: reward people who raise concerns, and keep watching agentic AI, content provenance, standards and incident reporting."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -5413,9 +6830,9 @@ TRACK.modules.push({
       {
        "q": "Why assess maturity by ZAIG layer?",
        "options": [
-        "It produces a higher overall score",
-        "Regulators require it",
-        "It avoids the need for audit",
+        "It produces a higher and more flattering overall score",
+        "Regulators require a score for each layer",
+        "It avoids the need for any internal audit",
         "It shows which layers lag and where to invest"
        ],
        "answer": 3,
@@ -5424,10 +6841,10 @@ TRACK.modules.push({
       {
        "q": "Which is a leading indicator of governance weakness?",
        "options": [
-        "Number of policy pages",
-        "Number of committee members",
-        "AI problems found externally rather than by internal controls",
-        "Office size"
+        "The number of pages in the AI policy",
+        "The number of members sitting on the AI governance committee",
+        "Problems found by outsiders, not internal controls",
+        "The size of the AI governance office budget"
        ],
        "answer": 2,
        "explain": "External discovery signals that internal detection is failing."
@@ -5446,10 +6863,10 @@ TRACK.modules.push({
       {
        "q": "What best sustains responsible AI beyond formal controls?",
        "options": [
-        "Longer policies",
-        "Fewer metrics",
-        "Keeping AI use secret",
-        "A culture that rewards raising concerns, modelled by leaders"
+        "Longer and more detailed policies for every team",
+        "Fewer metrics so staff are not distracted",
+        "Keeping AI use confidential to avoid criticism",
+        "Leaders modelling a culture of raising concerns"
        ],
        "answer": 3,
        "explain": "Culture catches what controls miss."

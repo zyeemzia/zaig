@@ -165,6 +165,74 @@ TRACK.modules.push({
      "title": "Why machine-learning systems fail"
     },
     {
+     "type": "chart",
+     "kind": "line",
+     "title": "Overfitting: training error vs error on new cases",
+     "labels": [
+      "Very simple",
+      "Simple",
+      "Moderate",
+      "Complex",
+      "Very complex",
+      "Extreme"
+     ],
+     "series": [
+      {
+       "name": "Error on training data",
+       "values": [
+        30,
+        22,
+        15,
+        9,
+        4,
+        1
+       ]
+      },
+      {
+       "name": "Error on new data",
+       "values": [
+        32,
+        25,
+        19,
+        18,
+        23,
+        31
+       ]
+      }
+     ],
+     "unit": "%",
+     "yLabel": "Error rate",
+     "caption": "Illustrative numbers. As a model becomes more complex, training error keeps falling while error on unseen cases starts to rise: that widening gap is overfitting, and it is why validation must always use data the model has not seen."
+    },
+    {
+     "type": "cycle",
+     "title": "How a feedback loop entrenches a model's choices",
+     "center": "Model learns from its own decisions",
+     "items": [
+      {
+       "label": "Model scores",
+       "text": "Applicants from some areas receive lower scores"
+      },
+      {
+       "label": "Decisions",
+       "text": "Fewer loans are approved in those areas"
+      },
+      {
+       "label": "Outcomes recorded",
+       "text": "Only approved borrowers generate repayment data"
+      },
+      {
+       "label": "Training data",
+       "text": "Evidence about refused groups stays thin"
+      },
+      {
+       "label": "Retraining",
+       "text": "The model grows even less confident about them"
+      }
+     ],
+     "caption": "Each turn of the loop narrows the evidence about the people the model already disfavours. Breaking it takes deliberate action, such as reviewing a sample of refusals or testing approvals in a controlled way."
+    },
+    {
      "type": "compare",
      "title": "Traditional software vs machine-learning systems",
      "columns": [
@@ -196,12 +264,12 @@ TRACK.modules.push({
      "situation": "A university in Dhaka buys a tool that predicts which first-year students are likely to drop out so advisers can contact them. The IT team plans to approve it through the normal software change process: security scan, user acceptance test, go-live. You are the new AI governance lead. What is the MOST important additional step?",
      "options": [
       {
-       "text": "Ask the vendor for a faster implementation timeline so advisers can start sooner.",
+       "text": "Ask the vendor to speed up implementation and provide extra training sessions so that advisers can start contacting at-risk students before mid-term exams.",
        "feedback": "Speed is not the issue. The concern is that a predictive model can behave unfairly or degrade in ways a normal software test would not reveal.",
        "best": false
       },
       {
-       "text": "Require evidence of how the model was trained and tested, including performance across student groups and whether the training data reflects this university's students.",
+       "text": "Require evidence of how the model was trained and tested, including results across student groups and fit with this university's student data.",
        "feedback": "Best. A predictive model's behaviour depends on its training data and statistical performance. Testing across groups and checking data fit are governance questions the normal change process does not ask.",
        "best": true
       },
@@ -211,7 +279,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Run the security scan twice to be safe.",
+       "text": "Run the security scan twice and add a penetration test, because a tool holding student records must be especially well protected.",
        "feedback": "Security matters, but repeating it does not address fairness, accuracy or data fit, which are the distinctive AI risks here.",
        "best": false
       }
@@ -259,15 +327,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "An AI system **infers** its behaviour from data and objectives; that is what separates it from rules-based software and why it needs extra governance.",
+      "Training shapes what a model learned; inference is where its outputs affect people, so controls must cover both.",
+      "Most failures trace back to data and objectives: unrepresentative samples, proxies, overfitting, drift, feedback loops and the wrong target.",
+      "Normal software change processes do not test fairness, data fit or degradation over time; add those questions for any predictive model."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "What most clearly distinguishes an AI system from conventional rules-based software?",
        "options": [
-        "It always runs in a public cloud environment",
-        "It cannot be tested before it is deployed",
-        "It infers how to produce outputs from data and objectives rather than following explicitly written logic",
-        "It is always fully autonomous and needs no human"
+        "It always runs on large cloud platforms rather than local servers",
+        "It cannot be tested in any meaningful way before deployment",
+        "It infers its outputs from data and objectives",
+        "It is always fully autonomous and needs no human involvement"
        ],
        "answer": 2,
        "explain": "AI systems infer their behaviour from data and objectives. Cloud hosting, testability and autonomy vary and are not defining features."
@@ -275,10 +353,10 @@ TRACK.modules.push({
       {
        "q": "A recruitment model never sees candidates' gender, yet favours men. Which failure is the most likely cause?",
        "options": [
-        "Overfitting to the test data",
-        "Reinforcement learning rewards",
-        "An encryption weakness",
-        "A proxy variable, such as a hobby or past employer, correlates with gender"
+        "Overfitting to a small test dataset",
+        "Reward hacking in reinforcement learning",
+        "A weakness in how the data was encrypted",
+        "A proxy feature correlated with gender"
        ],
        "answer": 3,
        "explain": "Removing a protected attribute does not remove its influence if other features act as proxies for it."
@@ -286,10 +364,10 @@ TRACK.modules.push({
       {
        "q": "A fraud model performed well at launch, but accuracy fell after a new mobile wallet changed how customers pay. What is this called?",
        "options": [
-        "Overfitting",
-        "Distribution shift or drift",
-        "Hallucination",
-        "Prompt injection"
+        "Overfitting to old training data",
+        "Distribution shift (drift)",
+        "Hallucination by the model",
+        "Prompt injection by attackers"
        ],
        "answer": 1,
        "explain": "The data in use has moved away from the training distribution, so the model's learned patterns fit less well."
@@ -308,10 +386,10 @@ TRACK.modules.push({
       {
        "q": "Why should governance cover both training and inference?",
        "options": [
-        "Training is the only phase regulators care about",
-        "Inference never involves personal data",
-        "Risks arise from what the model learned and from how its outputs are used in decisions",
-        "Training happens only once and needs no records"
+        "Training is the only phase that regulators ever examine",
+        "Inference never involves any personal data about individuals",
+        "Risks come from what it learned and how outputs are used",
+        "Training happens only once, so it needs no records kept"
        ],
        "answer": 2,
        "explain": "Data and design choices made in training shape behaviour, while inference is where outputs affect people. Both need controls."
@@ -459,8 +537,106 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "sequence",
+     "title": "A grounded chatbot answer, step by step",
+     "actors": [
+      "Customer",
+      "Chat app",
+      "Policy index",
+      "Language model"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Is there a fee waiver for students?"
+      },
+      {
+       "from": 1,
+       "to": 1,
+       "label": "Input filter; AI disclosure shown"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Search approved fee policies"
+      },
+      {
+       "from": 2,
+       "to": 1,
+       "label": "Top passages with document IDs",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 3,
+       "label": "Instructions + passages + question"
+      },
+      {
+       "from": 3,
+       "to": 1,
+       "label": "Draft answer citing passages",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 1,
+       "label": "Output check: grounded? fee topic?"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Answer with source, or hand-off to staff",
+       "reply": true
+      }
+     ],
+     "caption": "Notice where the controls sit: the model sees only approved passages, and the application checks the draft before the customer does. Sensitive topics such as fees and complaints can be routed to staff."
+    },
+    {
      "type": "text",
-     "text": "Governance now also has to cover **AI agents**: systems that plan multi-step tasks and act through tools, such as sending emails, updating records or making payments. An agent's errors are no longer just words on a screen; they become actions. The more autonomy and the more powerful the tools, the stronger the controls must be: least-privilege permissions, human approval for consequential actions, activity logs and the ability to stop the agent."
+     "text": "Governance now also has to cover **AI agents**: systems that plan multi-step tasks and act through tools, such as sending emails, updating records or making payments. An agent's errors are no longer just words on a screen; they become actions. Many organisations describe **autonomy levels**, from suggesting, to acting with approval, to acting alone within limits, and require fresh approval before an agent moves up a level. The more autonomy and the more powerful the tools, the stronger the controls must be: least-privilege permissions, spending and action limits, human approval for consequential actions, activity logs and a tested way to stop the agent."
+    },
+    {
+     "type": "matrix",
+     "title": "Agent autonomy versus tool power",
+     "x": "Power of the agent's tools (read-only to moving money or changing records)",
+     "y": "Autonomy (suggests to acts without approval)",
+     "quadrants": [
+      {
+       "title": "Automate with guardrails",
+       "items": [
+        "Read-only research or search agents",
+        "Logs, rate limits and spot checks",
+        "Example: overnight summaries of public filings"
+       ]
+      },
+      {
+       "title": "Strongest controls",
+       "items": [
+        "Least-privilege tool scopes and spending limits",
+        "Human approval above set thresholds",
+        "Full activity logs and a tested stop switch",
+        "Example: an agent that issues refunds"
+       ]
+      },
+      {
+       "title": "Assistive use",
+       "items": [
+        "The agent drafts, a person decides",
+        "Standard acceptable-use rules",
+        "Example: drafting meeting notes"
+       ]
+      },
+      {
+       "title": "Human approves each action",
+       "items": [
+        "Powerful tools, but every action needs sign-off",
+        "Check approvers are not rubber-stamping",
+        "Example: preparing supplier payments"
+       ]
+      }
+     ],
+     "caption": "Risk grows along both axes. Move an agent one step at a time, more autonomy or a more powerful tool, and re-assess before each step instead of jumping straight to the top-right corner."
     },
     {
      "type": "compare",
@@ -500,12 +676,12 @@ TRACK.modules.push({
      "situation": "The marketing team at a garment exporter wants to connect a generative-AI assistant to the shared mailbox so it can read buyer emails and reply automatically. What should the governance lead recommend FIRST?",
      "options": [
       {
-       "text": "Approve it, because the vendor says the model is the most accurate on the market.",
+       "text": "Approve it, because the vendor says its model is the most accurate on the market and the assistant will cut reply times from days to minutes.",
        "feedback": "Benchmark accuracy does not address prompt injection, data leakage or the risk of committing the company to terms in an automatic reply.",
        "best": false
       },
       {
-       "text": "Start with a draft-only mode where the assistant suggests replies and a person sends them, with permissions limited to the mailbox and logging switched on.",
+       "text": "Start in draft-only mode: the assistant suggests replies, a person sends them, with mailbox-only permissions and logging on.",
        "feedback": "Best. It captures most of the value while keeping a human in control of outward actions, limits the agent's permissions and creates evidence for later review.",
        "best": true
       },
@@ -515,7 +691,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Let the team run it for a month and review complaints afterwards.",
+       "text": "Let the team run it in full automatic mode for a month, then review any complaints from buyers and decide whether controls are needed.",
        "feedback": "Waiting for complaints means harm happens first. Controls should be designed before go-live.",
        "best": false
       }
@@ -573,15 +749,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Language models produce **plausible** text, not verified facts; grounding, testing and human review are the core controls.",
+      "Generative AI adds distinctive failure modes: confabulation, prompt injection, data leakage, IP issues, over-reliance and deepfakes.",
+      "Controls sit in layers around the model: user experience, guardrails, retrieval and tools, the model itself, and data and hosting.",
+      "Agents turn errors into actions; scale controls with autonomy and tool power, and raise autonomy one approved step at a time."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Why can a large language model produce a confident answer that is false?",
        "options": [
         "It deliberately deceives users to save computing cost",
-        "It generates statistically likely text rather than checking claims against facts",
-        "It only fails when the internet connection is slow",
-        "It is designed to refuse every factual question"
+        "It predicts likely text instead of checking facts",
+        "It only fails when its internet connection is slow",
+        "It is designed to refuse every factual question it gets"
        ],
        "answer": 1,
        "explain": "LLMs predict plausible continuations. Without grounding and verification, plausibility can diverge from truth."
@@ -600,10 +786,10 @@ TRACK.modules.push({
       {
        "q": "Which control best reduces the risk of an AI agent sending a wrong payment?",
        "options": [
-        "Requiring human approval for payments and limiting the agent's permissions",
-        "Using a larger model",
-        "Making the system prompt longer",
-        "Turning off logging to improve speed"
+        "Human approval for payments and limited permissions",
+        "Switching the agent to the largest available model",
+        "Making the agent's system prompt longer and more detailed",
+        "Turning off logging so the agent runs faster"
        ],
        "answer": 0,
        "explain": "Least privilege and approval gates contain the impact of agent errors. Model size does not guarantee correct actions."
@@ -611,10 +797,10 @@ TRACK.modules.push({
       {
        "q": "Compared with predictive AI, generative AI is harder to govern mainly because:",
        "options": [
-        "It never uses personal data",
-        "It cannot be bought from vendors",
-        "It is always less accurate",
-        "It is open-ended and available to many users for uses nobody planned"
+        "It never uses personal data, so privacy rules do not fit",
+        "It cannot be bought from vendors and must be built",
+        "It is always less accurate than predictive models",
+        "Open-ended outputs and many users create unplanned uses"
        ],
        "answer": 3,
        "explain": "The breadth of possible uses and users widens the risk surface beyond a single defined decision process."
@@ -622,9 +808,9 @@ TRACK.modules.push({
       {
        "q": "What does grounding a chatbot in approved documents mainly reduce?",
        "options": [
-        "The need for any human oversight",
-        "Hosting costs",
-        "The number of languages supported",
+        "The need for any human oversight of the chatbot",
+        "The overall hosting and licensing costs of running the chatbot",
+        "The number of languages the chatbot can support",
         "Invented answers that are not supported by company policy"
        ],
        "answer": 3,
@@ -686,50 +872,183 @@ TRACK.modules.push({
      ]
     },
     {
-     "type": "layers",
-     "title": "A typical AI supply chain (top layer first)",
-     "items": [
+     "type": "topology",
+     "title": "A typical AI supply chain",
+     "nodes": [
       {
-       "label": "Affected people",
-       "parts": [
-        "Customers, patients, students, workers, citizens"
-       ]
+       "id": "data",
+       "kind": "db",
+       "label": "Training data",
+       "sub": "Licensed, public, labelled",
+       "x": 1,
+       "y": 0
       },
       {
-       "label": "Deploying organisation",
-       "parts": [
-        "Configures, operates and oversees the system",
-        "Owns the decision and the customer relationship"
-       ]
+       "id": "cloud",
+       "kind": "cloud",
+       "label": "Cloud compute",
+       "sub": "Hosting and hardware",
+       "x": 5,
+       "y": 0
       },
       {
-       "label": "Application provider",
-       "parts": [
-        "Builds the product around one or more models",
-        "Adds retrieval, tools, user interface and guardrails"
-       ]
-      },
-      {
+       "id": "model",
+       "kind": "model",
        "label": "Model provider",
-       "parts": [
-        "Trains the foundation or specialist model",
-        "Sets usage policies and licence terms"
-       ]
+       "sub": "Foundation or specialist model",
+       "x": 3,
+       "y": 1.5
       },
       {
-       "label": "Data and compute",
-       "parts": [
-        "Training data sources and labellers",
-        "Cloud and hardware providers"
-       ]
+       "id": "app",
+       "kind": "api",
+       "label": "App provider",
+       "sub": "Adds retrieval, tools, UI",
+       "x": 3,
+       "y": 2.75
+      },
+      {
+       "id": "org",
+       "kind": "process",
+       "label": "Deploying org",
+       "sub": "Configures, operates, oversees",
+       "x": 3,
+       "y": 4.5
+      },
+      {
+       "id": "staff",
+       "kind": "team",
+       "label": "Operators",
+       "sub": "Staff who oversee outputs",
+       "x": 1,
+       "y": 4.5
+      },
+      {
+       "id": "own",
+       "kind": "storage",
+       "label": "Your data",
+       "sub": "Prompts, documents, logs",
+       "x": 5,
+       "y": 4.5
+      },
+      {
+       "id": "people",
+       "kind": "user",
+       "label": "Affected people",
+       "sub": "Customers, patients, workers",
+       "x": 3,
+       "y": 6
       }
-     ]
+     ],
+     "links": [
+      {
+       "a": "data",
+       "b": "model",
+       "label": "training"
+      },
+      {
+       "a": "cloud",
+       "b": "model",
+       "label": "compute"
+      },
+      {
+       "a": "model",
+       "b": "app",
+       "label": "API or weights"
+      },
+      {
+       "a": "app",
+       "b": "org",
+       "label": "product, docs"
+      },
+      {
+       "a": "staff",
+       "b": "org",
+       "label": "oversight"
+      },
+      {
+       "a": "own",
+       "b": "app",
+       "label": "prompts",
+       "style": "dashed"
+      },
+      {
+       "a": "org",
+       "b": "people",
+       "label": "decisions"
+      }
+     ],
+     "zones": [
+      {
+       "label": "Suppliers (third and fourth parties)",
+       "x": 0,
+       "y": 0,
+       "w": 7,
+       "h": 4,
+       "tone": "neutral"
+      },
+      {
+       "label": "Your organisation",
+       "x": 0,
+       "y": 4,
+       "w": 7,
+       "h": 2,
+       "tone": "accent"
+      }
+     ],
+     "caption": "Risk flows down the chain: data rights, model behaviour and vendor changes all reach your organisation and the people you serve. Your suppliers' own suppliers (fourth parties) belong in due diligence too."
     },
     {
      "type": "callout",
      "kind": "warning",
      "text": "If you substantially modify a bought system, retrain it for a new purpose or sell it under your own name, you may move from deployer to provider and inherit the provider's heavier duties. Record every significant change to an AI system and reassess the role each time.",
      "title": "Roles can change"
+    },
+    {
+     "type": "tree",
+     "title": "Provider or deployer? A first-pass test",
+     "root": {
+      "label": "An AI system you use or offer",
+      "children": [
+       {
+        "label": "Built it, or had it built, and offer it under your name?",
+        "children": [
+         {
+          "label": "Provider",
+          "text": "Heaviest duties: design, testing, documentation"
+         }
+        ]
+       },
+       {
+        "label": "Rebranded, substantially modified or repurposed a bought system?",
+        "children": [
+         {
+          "label": "Likely provider for that system",
+          "text": "Reassess after every significant change"
+         }
+        ]
+       },
+       {
+        "label": "Using a bought system as supplied, under your authority?",
+        "children": [
+         {
+          "label": "Deployer",
+          "text": "Use as instructed; oversight, monitoring, notices"
+         }
+        ]
+       },
+       {
+        "label": "Passing a system on unchanged?",
+        "children": [
+         {
+          "label": "Importer or distributor",
+          "text": "Check the provider met its duties"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Work through the branches for each inventory entry and record the answer with a date. Exact legal tests differ by law (Module 3 covers the EU AI Act), so treat this as a first pass, not legal advice."
     },
     {
      "type": "text",
@@ -864,7 +1183,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Remove the tool until each department justifies its use.",
+       "text": "Remove the tool from all three departments until each one submits a written business case justifying its continued use.",
        "feedback": "Removing a widely used tool without analysis disrupts work and may push use into unmanaged alternatives.",
        "best": false
       },
@@ -918,6 +1237,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Your **role** (provider, deployer, importer or distributor) decides your duties, and it can change when you modify, rebrand or repurpose a system.",
+      "Shadow AI is normal: find it through procurement, expenses, software catalogues and logs, then offer a governed path.",
+      "Each inventory entry needs a purpose, a business owner, a role, the model and provider, data used, people affected and a provisional tier.",
+      "Keep the inventory alive by making registration a condition of procurement and go-live."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -934,10 +1263,10 @@ TRACK.modules.push({
       {
        "q": "Which change is most likely to turn a deployer into a provider?",
        "options": [
-        "Changing the colour of the user interface",
-        "Adding a new user account",
-        "Renewing the annual licence",
-        "Retraining a bought system for a new purpose and offering it under its own brand"
+        "Changing the colour scheme and logo of the user interface",
+        "Adding new user accounts for another department",
+        "Renewing the annual licence on improved commercial terms",
+        "Retraining it for a new purpose and rebranding it"
        ],
        "answer": 3,
        "explain": "Substantial modification or rebranding can shift provider duties to the organisation that made the change."
@@ -945,9 +1274,9 @@ TRACK.modules.push({
       {
        "q": "What is the fastest reliable starting point for finding AI in an organisation?",
        "options": [
-        "Waiting for staff to self-report incidents",
+        "Waiting for staff to report any AI incidents they notice",
         "Procurement, expense and software catalogue records",
-        "Reading vendors' marketing material",
+        "Reading vendors' marketing material and product brochures",
         "Checking only the data science team's projects"
        ],
        "answer": 1,
@@ -956,10 +1285,10 @@ TRACK.modules.push({
       {
        "q": "Why should an AI inventory record the people affected by each system?",
        "options": [
-        "Impact on people drives the risk tier and the controls required",
-        "It is needed to calculate licence fees",
-        "It replaces the need for an impact assessment",
-        "It is only needed for marketing purposes"
+        "It drives the risk tier and the controls required",
+        "It is needed to calculate the licence fees for each system",
+        "It replaces the need for any separate impact assessment later",
+        "It is only needed for marketing and communication purposes"
        ],
        "answer": 0,
        "explain": "Who is affected, and how seriously, determines the level of scrutiny and the obligations that apply."
@@ -967,10 +1296,10 @@ TRACK.modules.push({
       {
        "q": "What is the best response to widespread shadow AI use?",
        "options": [
-        "Provide a governed alternative, clear use rules and awareness, then bring uses into the inventory",
-        "Dismiss staff found using public tools",
+        "Offer a governed tool, clear rules and awareness",
+        "Dismiss staff found using public tools to deter others",
         "Ignore it because it is personal productivity",
-        "Block all websites with AI in the name"
+        "Block every website that has AI anywhere in its name"
        ],
        "answer": 0,
        "explain": "Enforcement alone drives use underground. A safe approved path plus rules and education brings use into view."
@@ -994,6 +1323,48 @@ TRACK.modules.push({
     {
      "type": "text",
      "text": "AI governance is the system of **direction, rules, roles and evidence** that makes sure an organisation's use of AI is lawful, ethical, safe and aligned with its goals. It is not a brake on innovation. Organisations with good governance tend to move faster, because teams know what is allowed, approvals are predictable and leaders can defend their decisions to regulators, customers and the public."
+    },
+    {
+     "type": "timeline",
+     "title": "How AI governance reached the boardroom",
+     "items": [
+      {
+       "when": "2016–2019",
+       "label": "Principles wave",
+       "text": "Companies, governments and international bodies publish AI ethics principles; the OECD AI Principles are adopted in 2019"
+      },
+      {
+       "when": "2021",
+       "label": "UNESCO Recommendation",
+       "text": "First global agreement on the ethics of AI"
+      },
+      {
+       "when": "Late 2022",
+       "label": "Generative AI goes public",
+       "text": "Public chat assistants reach millions of users within weeks"
+      },
+      {
+       "when": "2023",
+       "label": "Frameworks and standards",
+       "text": "NIST AI RMF 1.0 (January) and ISO/IEC 42001 (December)"
+      },
+      {
+       "when": "Aug 2024",
+       "label": "EU AI Act in force",
+       "text": "First comprehensive AI law, with obligations phased in from 2025"
+      },
+      {
+       "when": "2025",
+       "label": "First obligations apply",
+       "text": "EU prohibitions and AI literacy (February) and general-purpose AI model duties (August); a GPAI code of practice is published"
+      },
+      {
+       "when": "2026",
+       "label": "Wider application",
+       "text": "South Korea's AI Basic Act in force from January; more EU AI Act duties scheduled from August, subject to simplification proposals"
+      }
+     ],
+     "caption": "In under a decade AI governance moved from voluntary principles to binding law and certifiable standards. That pace is why this track teaches you to check current official texts rather than memorise dates."
     },
     {
      "type": "table",
@@ -1161,12 +1532,12 @@ TRACK.modules.push({
      "situation": "The chief executive of a fast-growing fintech in Dhaka says: 'Governance will slow us down; we will add it once we are bigger.' Which response from the AI governance lead is MOST persuasive?",
      "options": [
       {
-       "text": "Explain that governance is legally required everywhere, so there is no choice.",
+       "text": "Explain that governance is legally required everywhere, so the company has no choice, and that regulators will fine any fintech that delays putting it in place.",
        "feedback": "Legal duties vary by jurisdiction and use case. Leading with compulsion misses the business argument and may not be accurate for every system.",
        "best": false
       },
       {
-       "text": "Propose proportionate governance: light rules for low-risk tools and focused controls on credit and fraud models, showing how it speeds approvals and protects partner and regulator trust.",
+       "text": "Propose proportionate governance: light rules for low-risk tools, focused controls on credit and fraud models, framed as faster approvals and partner trust.",
        "feedback": "Best. Proportionality keeps low-risk work fast, concentrates effort where harm and liability are greatest and frames governance as an enabler of growth and partnerships.",
        "best": true
       },
@@ -1220,15 +1591,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "AI governance is direction, rules, roles and evidence; it differs from day-to-day management and from compliance checking.",
+      "Harms reach individuals, groups, organisations and society, and most real failures were governance failures rather than technical surprises.",
+      "The ZAIG Stack builds eight layers from Foundations to Assurance, each resting on the ones below.",
+      "Proportionality keeps low-risk AI fast and concentrates effort where harm could be severe."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Which statement best describes AI governance?",
        "options": [
-        "A one-time legal review before launch",
-        "A technical team that tunes model accuracy",
-        "A ban on AI until regulation is final",
-        "Direction, rules, roles and evidence that keep AI use lawful, ethical, safe and aligned with goals"
+        "A one-time legal review carried out before each launch",
+        "A technical team that tunes the accuracy of models",
+        "A moratorium on AI use until regulation is finally settled",
+        "Direction, rules, roles and evidence for using AI well"
        ],
        "answer": 3,
        "explain": "Governance is a continuing system of direction and accountability, not a single check or a technical activity."
@@ -1236,10 +1617,10 @@ TRACK.modules.push({
       {
        "q": "In many real AI failures, what was usually missing?",
        "options": [
-        "More powerful hardware",
-        "Questions about harm, testing for it, monitoring and clear authority to stop the system",
-        "Larger training datasets",
-        "Faster deployment pipelines"
+        "More powerful computing hardware for training and inference",
+        "Harm analysis, testing, monitoring and authority to stop",
+        "Much larger and more varied training datasets overall",
+        "Faster and more automated deployment pipelines"
        ],
        "answer": 1,
        "explain": "The technology often worked as designed; the failure was in governance around it."
@@ -1258,10 +1639,10 @@ TRACK.modules.push({
       {
        "q": "Applying proportionality means:",
        "options": [
-        "Light controls for low-risk uses and deeper controls for high-risk uses",
-        "The same process for every AI system",
-        "Skipping governance for internal tools",
-        "Only governing systems that a regulator names"
+        "Lighter controls for low risk, deeper ones for high risk",
+        "Applying the same full process to every AI system",
+        "Skipping governance entirely for internal-only tools",
+        "Only governing the systems that a regulator names explicitly"
        ],
        "answer": 0,
        "explain": "Proportionality concentrates effort where potential harm is greatest while keeping low-risk work fast."
@@ -1269,10 +1650,10 @@ TRACK.modules.push({
       {
        "q": "Who sets AI risk appetite and overall accountability?",
        "options": [
-        "Individual data scientists",
-        "The model vendor",
+        "Individual data scientists who build each model",
+        "The vendor that supplies the main model",
         "The board and senior leadership",
-        "External auditors"
+        "The external auditors who review the accounts"
        ],
        "answer": 2,
        "explain": "Governance direction comes from the top; management works within it and assurance checks it."
@@ -1395,6 +1776,56 @@ TRACK.modules.push({
      "text": "Each principle must be translated downwards. 'We are fair' becomes 'credit models are tested for approval-rate gaps between men and women and between urban and rural applicants before every release', which becomes a control with an owner, a threshold and a record. If you cannot point to the evidence layer, the principle is not yet operational."
     },
     {
+     "type": "tree",
+     "title": "From principle to evidence: a worked example",
+     "root": {
+      "label": "Principle: we treat customers fairly",
+      "children": [
+       {
+        "label": "Requirement: approval-rate ratio of at least 0.8",
+        "text": "Credit models; women vs men, rural vs urban",
+        "children": [
+         {
+          "label": "Control: fairness test in the release gate",
+          "children": [
+           {
+            "label": "Evidence: signed bias report"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Requirement: every refusal can be contested",
+        "children": [
+         {
+          "label": "Control: appeal route in refusal letters",
+          "children": [
+           {
+            "label": "Evidence: appeal log and response times"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "label": "Requirement: thin-file applicants get a fair route",
+        "children": [
+         {
+          "label": "Control: alternative-data review",
+          "children": [
+           {
+            "label": "Evidence: quarterly review sample"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Read each branch from the principle down. If a branch stops before the evidence level, the principle is not yet operational for that system."
+    },
+    {
      "type": "keypoints",
      "items": [
       "Principles published but no named owner for any of them.",
@@ -1447,7 +1878,7 @@ TRACK.modules.push({
      "situation": "A telecom operator published six AI principles two years ago. An internal review finds no team can name the owner of any principle, and none has ever changed a product decision. What should the AI governance lead propose FIRST?",
      "options": [
       {
-       "text": "Rewrite the principles with stronger wording.",
+       "text": "Rewrite the principles with stronger, more specific wording and have the board re-approve them, so staff can see that leadership is serious about them.",
        "feedback": "Better wording does not fix the missing link to decisions, owners and evidence.",
        "best": false
       },
@@ -1519,14 +1950,24 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Principles from different bodies converge on a common core: fairness, transparency, accountability, safety and security, privacy and human oversight.",
+      "A principle becomes real only when it is translated into requirements, owned controls and evidence.",
+      "Ethics washing shows when principles have no owners, no tests and have never changed a decision.",
+      "Start operationalising where risk is highest, and treat the principles as one system with tensions to balance."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Which set best describes the common core of responsible-AI principles?",
        "options": [
-        "Speed, scale, cost, novelty, automation, profit",
-        "Accuracy only, measured on public benchmarks",
-        "Open source, cloud hosting and large models",
+        "Speed, scale, cost, novelty, automation and profit growth for shareholders",
+        "Accuracy alone, measured on well-known public benchmarks",
+        "Open source, cloud hosting, large models and fast release cycles",
         "Fairness, transparency, accountability, safety, privacy, human oversight"
        ],
        "answer": 3,
@@ -1537,7 +1978,7 @@ TRACK.modules.push({
        "options": [
         "Value",
         "Principle",
-        "Incident",
+        "Incident report",
         "Requirement"
        ],
        "answer": 3,
@@ -1546,10 +1987,10 @@ TRACK.modules.push({
       {
        "q": "Which is the clearest sign of ethics washing?",
        "options": [
-        "A principle with a named owner",
-        "A fairness test in the release gate",
-        "Published principles that have never changed or stopped any project",
-        "An annual review of the principles"
+        "A principle with a named executive owner",
+        "A fairness test built into the release gate",
+        "Principles that have never changed any decision",
+        "An annual review of the principles by the board"
        ],
        "answer": 2,
        "explain": "Principles that never affect decisions indicate commitments without substance."
@@ -1557,10 +1998,10 @@ TRACK.modules.push({
       {
        "q": "Why should principles be treated as an interdependent system?",
        "options": [
-        "They support and sometimes constrain each other, so trade-offs must be balanced",
-        "They are legally identical everywhere",
-        "Only one principle can apply to each system",
-        "They replace the need for risk assessment"
+        "They support and constrain each other, so trade-offs need balancing",
+        "They are legally identical in every country that has adopted them",
+        "Only one principle can ever apply to each AI system",
+        "They replace the need for any separate risk assessment"
        ],
        "answer": 0,
        "explain": "For example, privacy limits data available for fairness testing, and transparency enables accountability."
@@ -1568,9 +2009,9 @@ TRACK.modules.push({
       {
        "q": "Where should translation of principles into controls start?",
        "options": [
-        "With low-risk tools because they are easiest",
+        "With low-risk tools, because they are the easiest to fix first",
         "With high-risk systems where harm and liability are greatest",
-        "With marketing material",
+        "With external marketing and website material",
         "With systems that are being retired"
        ],
        "answer": 1,
@@ -1704,6 +2145,39 @@ TRACK.modules.push({
      "title": "You cannot satisfy every fairness metric at once"
     },
     {
+     "type": "chart",
+     "kind": "bar",
+     "title": "Same accuracy, different harm",
+     "labels": [
+      "Urban men",
+      "Urban women",
+      "Rural men",
+      "Rural women"
+     ],
+     "series": [
+      {
+       "name": "Accuracy",
+       "values": [
+        91,
+        90,
+        90,
+        89
+       ]
+      },
+      {
+       "name": "Honest people wrongly flagged",
+       "values": [
+        4,
+        5,
+        8,
+        12
+       ]
+      }
+     ],
+     "unit": "%",
+     "caption": "Illustrative numbers for a fraud-flagging model. Accuracy is almost identical across groups, yet honest rural women are wrongly flagged three times as often as urban men. The error rate you choose to compare decides what you see."
+    },
+    {
      "type": "steps",
      "title": "Choosing a fairness approach for a use case",
      "items": [
@@ -1750,7 +2224,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Maximum total fraud detected, regardless of who is flagged.",
+       "text": "Maximum total fraud detected across the whole programme, regardless of which applicants are flagged or how long their payments are delayed.",
        "feedback": "Optimising detection alone ignores the distribution of wrongful harm, which is the core fairness concern.",
        "best": false
       }
@@ -1809,6 +2283,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Bias enters through history, sampling, measurement, modelling, evaluation and deployment, usually without anyone intending it.",
+      "Group, individual and procedural fairness ask different questions; procedural fairness matters even when outcomes look balanced.",
+      "When base rates differ, fairness metrics conflict, so choosing one is a documented policy decision.",
+      "Match the metric to the harm: selection rates for access decisions, false-positive rates for accusations."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -1825,10 +2309,10 @@ TRACK.modules.push({
       {
        "q": "Why is choosing a fairness metric partly a policy decision?",
        "options": [
-        "Regulators always prescribe one metric for every system",
-        "Different metrics conflict when base rates differ, so someone must choose which harm to prioritise",
-        "All metrics give the same answer",
-        "Metrics only matter for generative AI"
+        "Regulators always prescribe a single metric for every kind of AI system",
+        "Metrics can conflict, so someone must choose which harm matters most",
+        "All fairness metrics give the same answer on the same data",
+        "Fairness metrics only matter for generative AI systems"
        ],
        "answer": 1,
        "explain": "Mathematical incompatibility between metrics means values must guide the choice."
@@ -1837,9 +2321,9 @@ TRACK.modules.push({
        "q": "For a system that flags people for fraud investigation, which error rate usually matters most for fairness?",
        "options": [
         "False-positive rate",
-        "Training loss",
-        "Latency",
-        "Token count"
+        "Training loss of the model",
+        "Average latency per decision",
+        "Token count per request"
        ],
        "answer": 0,
        "explain": "Wrongful flags cause the main harm to honest people, so false-positive rates should be compared across groups."
@@ -1847,9 +2331,9 @@ TRACK.modules.push({
       {
        "q": "A speech assistant works well in standard Bangla but poorly for regional dialects. Which bias is this?",
        "options": [
-        "Historical bias in loan data",
+        "Historical bias in past loan records",
         "Confirmation bias of auditors",
-        "Automation bias",
+        "Automation bias among the users",
         "Language or representation bias"
        ],
        "answer": 3,
@@ -1858,10 +2342,10 @@ TRACK.modules.push({
       {
        "q": "Procedural fairness focuses on:",
        "options": [
-        "Equal selection rates only",
-        "Maximising model accuracy",
-        "Notice, explanation and the ability to contest decisions",
-        "Reducing compute costs"
+        "Equal selection rates across every protected group",
+        "Maximising the overall accuracy of the model",
+        "Notice, explanation and the chance to contest",
+        "Reducing the compute costs of each decision"
        ],
        "answer": 2,
        "explain": "Procedural fairness concerns how decisions are made and challenged, not only their statistical outcomes."
@@ -1997,6 +2481,61 @@ TRACK.modules.push({
      "title": "The 'the algorithm decided' trap"
     },
     {
+     "type": "sequence",
+     "title": "Contesting an AI-assisted decision",
+     "actors": [
+      "Applicant",
+      "Lender",
+      "Credit reviewer",
+      "Monitoring"
+     ],
+     "steps": [
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Refusal notice: main factors, appeal route"
+      },
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Asks for human review within 30 days"
+      },
+      {
+       "from": 1,
+       "to": 2,
+       "label": "Case file: score, factors, data used"
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "Re-assesses; checks data accuracy"
+      },
+      {
+       "from": 2,
+       "to": 1,
+       "label": "Upheld or overturned, with reasons",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "Outcome, reasons and next steps",
+       "reply": true
+      },
+      {
+       "from": 1,
+       "to": 3,
+       "label": "Log the appeal outcome"
+      },
+      {
+       "from": 3,
+       "to": 3,
+       "label": "Track upheld appeals by group"
+      }
+     ],
+     "caption": "Contestability is a process, not a sentence in a notice. The reviewer needs the case data and the authority to overturn, and appeal outcomes feed monitoring so repeated errors are fixed at the source."
+    },
+    {
      "type": "template",
      "title": "AI accountability matrix (RACI)",
      "purpose": "Make roles explicit for each key activity on a high-risk AI system.",
@@ -2031,7 +2570,7 @@ TRACK.modules.push({
      "situation": "A job applicant rejected by an AI screening tool asks a garment company's HR team why. The vendor says the model is proprietary and cannot be explained. What should HR do?",
      "options": [
       {
-       "text": "Tell the applicant the decision was made by the vendor's system and cannot be discussed.",
+       "text": "Tell the applicant the decision was made by the vendor's proprietary system and cannot be discussed, but thank them and invite them to apply again next year.",
        "feedback": "This abdicates accountability. The company is the deployer and remains answerable for its hiring decisions.",
        "best": false
       },
@@ -2101,6 +2640,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Transparency is about information, explainability about reasons and accountability about answerability.",
+      "Each audience needs different transparency: affected individuals, operators, regulators, boards and the public.",
+      "Deployers stay accountable for AI-assisted decisions; 'the system decided' is never an answer.",
+      "Contestability turns transparency into protection: a route to a human, a real review and redress."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -2128,10 +2677,10 @@ TRACK.modules.push({
       {
        "q": "Which artefact best serves an affected individual?",
        "options": [
-        "The model's full training dataset",
-        "A technical architecture diagram",
-        "The vendor's annual report",
-        "A plain notice with main factors and how to request human review"
+        "A copy of the model's full training dataset",
+        "A detailed technical architecture diagram of the system",
+        "The vendor's annual report and product sheet",
+        "A plain notice of main factors and how to appeal"
        ],
        "answer": 3,
        "explain": "Individuals need meaningful, usable information and a route to contest."
@@ -2139,10 +2688,10 @@ TRACK.modules.push({
       {
        "q": "Contestability means:",
        "options": [
-        "Affected people can challenge an outcome and reach a human reviewer",
-        "The model can be retrained daily",
-        "Auditors can access source code",
-        "Vendors can bid against each other"
+        "People can challenge an outcome and reach a human",
+        "The model can be retrained every day on fresh data",
+        "Auditors can access the full source code",
+        "Vendors can bid against each other for contracts"
        ],
        "answer": 0,
        "explain": "It is the practical safeguard that turns transparency into protection."
@@ -2151,9 +2700,9 @@ TRACK.modules.push({
        "q": "Which accountability building block lets you reconstruct what happened after an incident?",
        "options": [
         "Traceability through logs and records",
-        "Redress",
-        "Marketing",
-        "Procurement discounts"
+        "Redress for people who were harmed",
+        "Marketing of the responsible-AI programme",
+        "Procurement discounts from vendors"
        ],
        "answer": 0,
        "explain": "Without logs and records, investigation and explanation become guesswork."
@@ -2218,6 +2767,122 @@ TRACK.modules.push({
       ]
      ],
      "title": "Attacks specific to AI systems"
+    },
+    {
+     "type": "topology",
+     "title": "Attack paths into an AI assistant",
+     "nodes": [
+      {
+       "id": "att",
+       "kind": "attacker",
+       "label": "Attacker",
+       "x": 3,
+       "y": 0
+      },
+      {
+       "id": "web",
+       "kind": "doc",
+       "label": "Poisoned content",
+       "sub": "Web page or email",
+       "x": 1,
+       "y": 2
+      },
+      {
+       "id": "api",
+       "kind": "api",
+       "label": "Public API",
+       "sub": "Thousands of queries",
+       "x": 3,
+       "y": 2
+      },
+      {
+       "id": "data",
+       "kind": "db",
+       "label": "Training data",
+       "sub": "Or retrieval index",
+       "x": 5,
+       "y": 2
+      },
+      {
+       "id": "ai",
+       "kind": "model",
+       "label": "AI assistant",
+       "sub": "Model + guardrails",
+       "x": 3,
+       "y": 4
+      },
+      {
+       "id": "user",
+       "kind": "user",
+       "label": "Staff user",
+       "x": 1,
+       "y": 5
+      },
+      {
+       "id": "tools",
+       "kind": "process",
+       "label": "Connected tools",
+       "sub": "Email, records, payments",
+       "x": 5,
+       "y": 5
+      }
+     ],
+     "links": [
+      {
+       "a": "att",
+       "b": "web",
+       "label": "plants",
+       "style": "attack"
+      },
+      {
+       "a": "att",
+       "b": "api",
+       "label": "extraction",
+       "style": "attack"
+      },
+      {
+       "a": "att",
+       "b": "data",
+       "label": "poisoning",
+       "style": "attack"
+      },
+      {
+       "a": "web",
+       "b": "ai",
+       "label": "injection",
+       "style": "attack"
+      },
+      {
+       "a": "api",
+       "b": "ai"
+      },
+      {
+       "a": "data",
+       "b": "ai",
+       "label": "learns from"
+      },
+      {
+       "a": "user",
+       "b": "ai",
+       "label": "asks"
+      },
+      {
+       "a": "ai",
+       "b": "tools",
+       "label": "acts via"
+      }
+     ],
+     "zones": [
+      {
+       "label": "Your organisation",
+       "x": 0,
+       "y": 4,
+       "w": 7,
+       "h": 2,
+       "tone": "accent"
+      }
+     ],
+     "caption": "Three common paths: planting instructions in content the assistant reads (prompt injection), corrupting what it learns from or retrieves (poisoning), and querying it to copy its behaviour (extraction). The damage depends on what the assistant can reach, so limit its tools and permissions."
     },
     {
      "type": "callout",
@@ -2331,7 +2996,7 @@ TRACK.modules.push({
        "best": true
       },
       {
-       "text": "Anonymise by removing names, then use everything.",
+       "text": "Anonymise by removing customer names and wallet numbers, then use the full transaction histories, since the model will no longer know who any customer is.",
        "feedback": "Removing names alone rarely anonymises transaction data, which can often re-identify people.",
        "best": false
       },
@@ -2384,6 +3049,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Safety, robustness, security and privacy all ask whether the system keeps working safely when reality differs from the test lab.",
+      "AI adds attacks such as poisoning, prompt injection, extraction and inference, but ordinary security weaknesses still cause most incidents.",
+      "Design for safe failure: limits, fall-backs to people, red teaming and a tested off switch.",
+      "Privacy principles such as purpose limitation, minimisation and storage limitation apply in full to training data, prompts and logs."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -2400,9 +3075,9 @@ TRACK.modules.push({
       {
        "q": "Which principle is most at stake when payment data is reused to train a marketing model?",
        "options": [
-        "Robustness",
-        "Interpretability",
-        "Latency",
+        "Model robustness",
+        "Interpretability of outputs",
+        "Latency of the service",
         "Purpose limitation"
        ],
        "answer": 3,
@@ -2411,10 +3086,10 @@ TRACK.modules.push({
       {
        "q": "What does safe failure mean in practice?",
        "options": [
-        "Falling back to a human or simple rule when the system is uncertain or breaks",
-        "Never letting the system fail",
-        "Hiding errors from users",
-        "Restarting the server automatically"
+        "Falling back to a person or simple rule when unsure",
+        "Designing the system so that it can never fail in use",
+        "Hiding errors from users to maintain confidence",
+        "Restarting the server automatically after a crash"
        ],
        "answer": 0,
        "explain": "Safe failure accepts that systems fail and designs the failure to limit harm."
@@ -2422,10 +3097,10 @@ TRACK.modules.push({
       {
        "q": "Why apply ordinary security controls to AI first?",
        "options": [
-        "AI systems are immune to ordinary attacks",
-        "AI-specific attacks are illegal",
-        "Many AI incidents exploit ordinary weaknesses such as exposed keys or excessive permissions",
-        "Ordinary controls are cheaper to ignore"
+        "AI systems are immune to ordinary network attacks",
+        "AI-specific attacks are illegal, so attackers avoid them",
+        "Many incidents exploit basics such as exposed keys",
+        "Ordinary controls are cheaper to ignore than to apply"
        ],
        "answer": 2,
        "explain": "Basic hygiene closes the most common paths; AI-specific defences are added on top."
@@ -2433,8 +3108,8 @@ TRACK.modules.push({
       {
        "q": "Removing names from detailed transaction histories:",
        "options": [
-        "Always makes it anonymous",
-        "Makes it public data",
+        "Always makes it anonymous under every law",
+        "Turns it into public data that anyone may use",
         "Usually does not make the data anonymous",
         "Removes the need for a legal basis"
        ],
@@ -2507,6 +3182,45 @@ TRACK.modules.push({
       "Occasionally insert test cases to check reviewers are genuinely reviewing."
      ],
      "title": "Designing oversight that works"
+    },
+    {
+     "type": "matrix",
+     "title": "Choosing an oversight model",
+     "x": "Decision volume",
+     "y": "Impact of one wrong decision on a person",
+     "quadrants": [
+      {
+       "title": "Human in the loop",
+       "items": [
+        "A person approves each decision",
+        "Examples: loan refusals, clinical triage",
+        "Reviewers need time, information and authority"
+       ]
+      },
+      {
+       "title": "On the loop, with hard limits",
+       "items": [
+        "System acts; people monitor and reverse quickly",
+        "Adverse decisions routed for human review",
+        "Sampling, seeded cases, override tracking"
+       ]
+      },
+      {
+       "title": "Periodic review",
+       "items": [
+        "Owner checks samples and metrics",
+        "Example: internal document tagging"
+       ]
+      },
+      {
+       "title": "Automate and monitor",
+       "items": [
+        "Dashboards, alerts and spot checks",
+        "Example: spam filtering"
+       ]
+      }
+     ],
+     "caption": "Human in command sits above all four quadrants: people decide whether the system is used at all. As volume grows, oversight usually shifts from in-the-loop to on-the-loop, so monitoring and limits must get stronger to compensate."
     },
     {
      "type": "layers",
@@ -2649,7 +3363,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Double the number of officers without changing anything else.",
+       "text": "Double the number of credit officers so each can spend longer on every case, without changing the information they see or their training.",
        "feedback": "More reviewers may help with time, but without better information and training the same bias may persist.",
        "best": false
       }
@@ -2721,6 +3435,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Meaningful oversight needs competence, time, information, authority and the ability to stop the system.",
+      "Choose in-the-loop, on-the-loop or in-command oversight by impact and volume, and design against automation bias.",
+      "Near-zero override rates with very short reviews usually signal rubber-stamping; test reviewers with seeded cases.",
+      "Keep the AI policy short and stable, put detail in standards and procedures, and reuse existing privacy, security and procurement policies."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -2737,10 +3461,10 @@ TRACK.modules.push({
       {
        "q": "Which signal most suggests automation bias?",
        "options": [
-        "Reviewers ask for training",
-        "Reviewers overturn almost no recommendations after very short reviews",
-        "Override rates vary by case type",
-        "Reviewers escalate unclear cases"
+        "Reviewers ask for more training on the system",
+        "Almost no overrides after very short reviews",
+        "Override rates vary noticeably between case types",
+        "Reviewers escalate cases they find unclear"
        ],
        "answer": 1,
        "explain": "Very low override rates with minimal review time indicate rubber-stamping."
@@ -2748,10 +3472,10 @@ TRACK.modules.push({
       {
        "q": "Where should detailed testing requirements usually sit in a policy framework?",
        "options": [
-        "In the board-approved principles",
-        "In marketing material",
+        "In the short, board-approved principles statement",
+        "In external marketing and website material",
         "In standards and procedures beneath the policy",
-        "Nowhere; teams decide alone"
+        "Nowhere; each team decides for itself"
        ],
        "answer": 2,
        "explain": "Keeping detail in standards lets the policy stay short and stable."
@@ -2759,10 +3483,10 @@ TRACK.modules.push({
       {
        "q": "Which element is essential for meaningful oversight?",
        "options": [
-        "A larger model",
-        "A longer user manual only",
+        "A larger, more capable model with better accuracy",
+        "A longer and more detailed user manual for reviewers",
         "Authority and ability to override or stop the system",
-        "Hiding the model score"
+        "Hiding the model score so reviewers are not biased"
        ],
        "answer": 2,
        "explain": "Without authority to act, oversight is observation only."
@@ -2770,10 +3494,10 @@ TRACK.modules.push({
       {
        "q": "Why reuse existing privacy, security and procurement policies?",
        "options": [
-        "Because AI needs no new rules",
-        "Because regulators forbid new policies",
-        "To make the AI policy longer",
-        "To avoid duplication and conflict, adding only what AI needs"
+        "Because AI needs no new rules or controls of any kind",
+        "Because regulators forbid new standalone policies",
+        "To make the AI policy longer and more complete",
+        "To avoid duplication and add only what AI needs"
        ],
        "answer": 3,
        "explain": "Integration keeps the framework coherent and easier to follow."
@@ -2915,14 +3639,14 @@ TRACK.modules.push({
        "items": [
         "One horizontal law with tiers of obligations",
         "Example: the European Union's AI Act",
-        "Also: South Korea's AI Basic Act in force from January 2026"
+        "Also: South Korea's AI Basic Act, in force from January 2026"
        ]
       },
       {
        "title": "Principles plus existing regulators",
        "items": [
         "High-level principles applied by sector regulators",
-        "Examples: the United Kingdom; India's 2025 AI governance guidelines",
+        "Examples: the United Kingdom; Japan's 2025 AI Promotion Act; India's 2025 AI governance guidelines",
         "Light new legislation, more guidance"
        ]
       },
@@ -2930,8 +3654,8 @@ TRACK.modules.push({
        "title": "Targeted and sub-national rules",
        "items": [
         "Specific rules for specific technologies or uses",
-        "Examples: China's rules on recommendation algorithms, deep synthesis and generative AI; US state laws on hiring tools and high-risk AI",
-        "Patchwork that changes quickly"
+        "Examples: China's rules on recommendation algorithms, deep synthesis, generative AI and content labelling; US state laws on hiring tools, frontier models and high-risk AI",
+        "A patchwork that changes quickly"
        ]
       }
      ]
@@ -2964,12 +3688,12 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "'Only the EU AI Act, because it is the strictest law.'",
+       "text": "'Only the EU AI Act, because it is the strictest AI law in the world and meeting it will automatically satisfy every other rule that might apply.'",
        "feedback": "Strictness does not determine applicability. The EU law applies only where its scope conditions are met.",
        "best": false
       },
       {
-       "text": "'Let us map each system against existing local law, sector rules and any foreign law that applies through markets or partners, then align to a recognised framework.'",
+       "text": "'Let us map each system against local law, sector rules and any foreign law reaching us through markets or partners, then align to a framework.'",
        "feedback": "Best. Applicability depends on each system and its context. Mapping per system, then aligning to a framework, gives a defensible basis.",
        "best": true
       },
@@ -3003,6 +3727,52 @@ TRACK.modules.push({
       ]
      ],
      "rows": 6
+    },
+    {
+     "type": "tree",
+     "title": "Applicability map for one system (worked example)",
+     "root": {
+      "label": "Radiology triage assistant",
+      "text": "Private hospital group, Dhaka",
+      "children": [
+       {
+        "label": "Existing local law",
+        "children": [
+         {
+          "label": "Data protection, medical practice, cyber security"
+         }
+        ]
+       },
+       {
+        "label": "Sector and contracts",
+        "children": [
+         {
+          "label": "Health regulator; research partnership terms"
+         }
+        ]
+       },
+       {
+        "label": "Foreign law via partners",
+        "children": [
+         {
+          "label": "EU AI Act, if supplied or used in the EU"
+         },
+         {
+          "label": "GDPR for EU research data"
+         }
+        ]
+       },
+       {
+        "label": "Frameworks aligned to",
+        "children": [
+         {
+          "label": "ISO/IEC 42001 and NIST AI RMF"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Map each system, not the organisation as a whole. Some branches are certain, such as local data protection; others, such as the EU AI Act, depend on facts you must confirm with counsel."
     },
     {
      "type": "reflection",
@@ -3046,15 +3816,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Existing law (data protection, consumer, equality, product, employment, IP and sector rules) already governs most AI uses, with or without an AI act.",
+      "Approaches differ: comprehensive risk-based laws, principles applied by existing regulators, and targeted rules for specific technologies.",
+      "AI laws can reach organisations abroad when systems are placed on a market or their outputs are used there.",
+      "Map applicability per system, and expect voluntary frameworks and standards to harden into expected practice."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Bangladesh has no standalone AI act. Which statement is most accurate for an AI deployer there?",
        "options": [
-        "No rules apply until an AI act is passed",
-        "Existing laws such as data protection, consumer, cyber security and sector rules still apply",
-        "Only foreign AI laws apply",
-        "Only voluntary frameworks apply"
+        "No rules apply at all until a dedicated AI act is passed",
+        "Existing data, consumer, cyber and sector laws still apply",
+        "Only foreign AI laws such as the EU AI Act can apply",
+        "Only voluntary frameworks apply, so compliance is optional"
        ],
        "answer": 1,
        "explain": "AI is governed by existing general and sector law even without an AI-specific statute."
@@ -3062,9 +3842,9 @@ TRACK.modules.push({
       {
        "q": "Which is an example of soft law?",
        "options": [
-        "A statute passed by parliament",
-        "A court judgment",
-        "A criminal penalty",
+        "A statute passed by parliament on data protection",
+        "A binding court judgment in a discrimination case",
+        "A criminal penalty imposed for fraud",
         "A regulator's guidance note on AI in lending"
        ],
        "answer": 3,
@@ -3073,10 +3853,10 @@ TRACK.modules.push({
       {
        "q": "Why can a Dhaka software exporter be subject to EU AI rules?",
        "options": [
-        "Because all countries must adopt EU law",
-        "Only if it opens an office in Europe",
-        "Never; laws apply only within borders",
-        "Because the law can apply where systems are placed on the EU market or outputs used there"
+        "Because all countries are required to adopt EU law",
+        "Only if it opens a registered office or hires staff in Europe",
+        "Never; laws can only apply within national borders",
+        "It can apply where systems or outputs reach the EU market"
        ],
        "answer": 3,
        "explain": "Extraterritorial scope attaches to market placement and use, not just location of the company."
@@ -3095,10 +3875,10 @@ TRACK.modules.push({
       {
        "q": "How do voluntary frameworks 'harden' over time?",
        "options": [
-        "They automatically become criminal law",
-        "They expire after two years",
-        "Regulators, contracts and courts treat them as the expected standard of care",
-        "They replace data protection law"
+        "They automatically become criminal law after a few years",
+        "They expire after two years unless they are renewed",
+        "Regulators, buyers and courts expect them",
+        "They replace data protection law once widely adopted"
        ],
        "answer": 2,
        "explain": "Even without legal force, frameworks become benchmarks for reasonable conduct."
@@ -3121,7 +3901,7 @@ TRACK.modules.push({
    "blocks": [
     {
      "type": "text",
-     "text": "The EU Artificial Intelligence Act (Regulation (EU) 2024/1689) entered into force on 1 August 2024 and applies in stages. It is a **product-safety style law**: it sets requirements that AI systems must meet before and while they are on the EU market, scaled to risk. It sits alongside, not instead of, the GDPR, consumer law and sector rules. The summary below is our own description as of 2026."
+     "text": "The EU Artificial Intelligence Act (Regulation (EU) 2024/1689) entered into force on 1 August 2024 and applies in stages. It is a **product-safety style law**: it sets requirements that AI systems must meet before and while they are on the EU market, scaled to risk. It sits alongside, not instead of, the GDPR, consumer law and sector rules. Commission guidelines on the definition of an AI system and on prohibited practices (both February 2025) help with interpretation, and further guidance, for example on high-risk classification, has been arriving in stages. The summary below is our own description as of 2026."
     },
     {
      "type": "callout",
@@ -3278,6 +4058,62 @@ TRACK.modules.push({
      "title": "Classify these examples"
     },
     {
+     "type": "tree",
+     "title": "Classifying a system under the EU AI Act (simplified)",
+     "root": {
+      "label": "AI system in scope?",
+      "text": "Check scope and exclusions first",
+      "children": [
+       {
+        "label": "1. A prohibited practice?",
+        "children": [
+         {
+          "label": "Banned",
+          "text": "Since 2 February 2025"
+         }
+        ]
+       },
+       {
+        "label": "2. Safety component of a regulated product?",
+        "children": [
+         {
+          "label": "High risk",
+          "text": "Product route (Annex I)"
+         }
+        ]
+       },
+       {
+        "label": "3. In an Annex III use area?",
+        "children": [
+         {
+          "label": "High risk",
+          "text": "Unless the filter applies; profiling stays high risk"
+         }
+        ]
+       },
+       {
+        "label": "4. Chatbot, synthetic content, emotion or biometric categorisation?",
+        "children": [
+         {
+          "label": "Transparency duties",
+          "text": "Can apply on top of high risk"
+         }
+        ]
+       },
+       {
+        "label": "5. None of the above",
+        "children": [
+         {
+          "label": "Minimal risk",
+          "text": "Voluntary codes"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Ask the questions in order and stop at a prohibition; otherwise keep going, because a high-risk system can also carry transparency duties. General-purpose AI models follow a separate track for model providers."
+    },
+    {
      "type": "callout",
      "kind": "example",
      "text": "Large models that can perform a wide range of tasks (general-purpose AI models) have their own obligations, which apply to the **model provider** regardless of how the model is later used. Models trained with very large amounts of compute (a presumption threshold of 10^25 floating-point operations) or designated by the Commission are treated as having **systemic risk** and carry extra duties. A system built on such a model is then classified by its own use.",
@@ -3289,7 +4125,7 @@ TRACK.modules.push({
      "situation": "A Bangladeshi HR-tech company sells a tool to employers in Ireland that analyses video interviews and scores candidates' 'enthusiasm' from facial expressions to rank them for shortlisting. How should the governance lead classify it under the EU AI Act?",
      "options": [
       {
-       "text": "Minimal risk, because the employer makes the final hiring decision.",
+       "text": "Minimal risk, because the employer always makes the final hiring decision and the tool only ranks candidates to save recruiters' time on shortlisting.",
        "feedback": "Human final decision does not remove the classification. The tool ranks candidates in recruitment and infers emotions.",
        "best": false
       },
@@ -3299,7 +4135,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "At least high-risk as a recruitment tool, and the emotion-inference element is likely to fall within the workplace emotion-recognition prohibition; seek legal advice and redesign.",
+       "text": "At least high-risk as a recruitment tool, and inferring emotions likely falls within the workplace emotion-recognition ban; seek legal advice and redesign.",
        "feedback": "Best. Recruitment ranking is a listed high-risk use, and inferring emotions in an employment context is likely prohibited. The company, as provider, must act before selling in the EU.",
        "best": true
       },
@@ -3348,6 +4184,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "The EU AI Act is a product-safety style law that reaches providers anywhere when systems are placed on the EU market or outputs are used there.",
+      "Classify in order: prohibited, high risk (product route or Annex III), transparency duties, then minimal risk.",
+      "The high-risk filter can take narrow or preparatory systems out of high risk, but profiling systems stay high risk and the reasoning must be documented.",
+      "General-purpose AI models carry separate duties for the model provider, with extra duties where systemic risk applies."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -3365,9 +4211,9 @@ TRACK.modules.push({
        "q": "Which use is listed as a high-risk area?",
        "options": [
         "Evaluating creditworthiness of individuals",
-        "Filtering spam email",
-        "Recommending songs",
-        "Optimising warehouse stock"
+        "Filtering spam out of staff email inboxes",
+        "Recommending songs on a music streaming app",
+        "Optimising stock levels in a warehouse"
        ],
        "answer": 0,
        "explain": "Credit scoring falls within access to essential private services."
@@ -3375,10 +4221,10 @@ TRACK.modules.push({
       {
        "q": "A listed-area system performs only a narrow procedural task and does not profile people. It may:",
        "options": [
-        "Automatically be prohibited",
-        "Need no documentation at all",
-        "Fall outside high risk if the provider documents that assessment",
-        "Become a general-purpose model"
+        "Automatically be treated as a prohibited practice instead",
+        "Need no documentation or records of any kind",
+        "Fall outside high risk, with the assessment documented",
+        "Become a general-purpose AI model under the Act"
        ],
        "answer": 2,
        "explain": "The filter allows non-significant-risk systems out of high risk, but the reasoning must be documented and profiling systems stay high-risk."
@@ -3397,10 +4243,10 @@ TRACK.modules.push({
       {
        "q": "Emotion recognition used to assess employees' attitudes at work is:",
        "options": [
-        "Minimal risk",
+        "Minimal risk, because only the company's own employees are affected",
         "A prohibited practice unless for medical or safety reasons",
-        "Only a transparency issue",
-        "Unregulated"
+        "Only a transparency issue, solved by telling staff",
+        "Unregulated, because workplaces are excluded from scope"
        ],
        "answer": 1,
        "explain": "Workplace and education emotion recognition is banned with narrow medical and safety exceptions."
@@ -3530,6 +4376,59 @@ TRACK.modules.push({
      "title": "Deployer obligations for high-risk systems (summarised)"
     },
     {
+     "type": "sequence",
+     "title": "Who does what before a high-risk system is used",
+     "actors": [
+      "Provider",
+      "EU database",
+      "Deployer",
+      "Authority"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 0,
+       "label": "Risk management, data governance, QMS"
+      },
+      {
+       "from": 0,
+       "to": 0,
+       "label": "Conformity assessment; CE marking"
+      },
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Register the high-risk system"
+      },
+      {
+       "from": 0,
+       "to": 2,
+       "label": "Instructions for use + documentation"
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "Assign trained oversight; keep logs"
+      },
+      {
+       "from": 2,
+       "to": 2,
+       "label": "FRIA where required"
+      },
+      {
+       "from": 2,
+       "to": 3,
+       "label": "Notify FRIA results where required"
+      },
+      {
+       "from": 2,
+       "to": 0,
+       "label": "Report risks and serious incidents"
+      }
+     ],
+     "caption": "The provider proves conformity before market placement; the deployer prepares its own use before first use and reports problems back. Public-authority deployers also register their use in the EU database."
+    },
+    {
      "type": "callout",
      "kind": "insight",
      "text": "A deployer that puts its own name or trademark on a high-risk system, makes a substantial modification, or changes the intended purpose of a system so that it becomes high-risk is treated as a provider for that system, with the full set of provider obligations.",
@@ -3574,38 +4473,58 @@ TRACK.modules.push({
     },
     {
      "type": "text",
-     "text": "A voluntary **General-Purpose AI Code of Practice**, published in July 2025, offers model providers a way to demonstrate compliance with these duties on transparency, copyright and safety and security. Many major model providers signed it. For deployers, this matters in procurement: ask suppliers whether their model provider follows the code and request the documentation the Act requires them to pass downstream."
+     "text": "A voluntary **General-Purpose AI Code of Practice**, published in July 2025 and confirmed by the Commission and the AI Board as an adequate tool, offers model providers a way to demonstrate compliance on transparency, copyright and safety and security. Many major model providers signed all or part of it. The Commission also issued guidelines on the scope of the GPAI obligations and a template for the public training-content summary, and its power to fine GPAI providers applies from August 2026. For deployers, this matters in procurement: ask suppliers whether their model provider follows the code and request the documentation the Act requires them to pass downstream."
     },
     {
-     "type": "flow",
-     "title": "Application timeline (as legislated; check for amendments)",
+     "type": "timeline",
+     "title": "EU AI Act application timeline (check the current text)",
      "items": [
       {
-       "label": "1 Aug 2024",
-       "text": "Entry into force"
+       "when": "1 Aug 2024",
+       "label": "Entry into force"
       },
       {
-       "label": "2 Feb 2025",
-       "text": "Prohibitions and AI literacy apply"
+       "when": "2 Feb 2025",
+       "label": "Prohibitions and AI literacy",
+       "text": "Banned practices must stop; AI literacy measures expected"
       },
       {
-       "label": "2 Aug 2025",
-       "text": "GPAI model obligations, governance bodies and penalties apply"
+       "when": "2 Aug 2025",
+       "label": "GPAI models and governance",
+       "text": "Model-provider duties, AI Office and national authorities, penalty rules"
       },
       {
-       "label": "2 Aug 2026",
-       "text": "Most remaining provisions, including Annex III high-risk and transparency duties"
+       "when": "Nov 2025",
+       "label": "Simplification proposed",
+       "text": "Digital omnibus proposes linking high-risk dates to available standards"
       },
       {
-       "label": "2 Aug 2027",
-       "text": "High-risk rules for AI in regulated products; deadline for GPAI models placed on the market before August 2025"
+       "when": "2 Aug 2026",
+       "label": "Main application date",
+       "text": "Annex III high-risk and transparency duties as legislated; Commission fines for GPAI providers enforceable"
+      },
+      {
+       "when": "2 Aug 2027",
+       "label": "Product route and legacy GPAI",
+       "text": "High-risk AI in regulated products; deadline for GPAI models placed on the market before August 2025"
+      },
+      {
+       "when": "Dec 2027 / Aug 2028",
+       "label": "Proposed backstops",
+       "text": "Latest dates proposed for Annex III and product-route high-risk duties, if adopted"
+      },
+      {
+       "when": "2 Aug 2030",
+       "label": "Public-sector legacy systems",
+       "text": "Earlier high-risk systems used by public authorities must comply"
       }
-     ]
+     ],
+     "caption": "Dates up to August 2025 have already applied. Later dates depend on whether and how the simplification proposals are adopted, so confirm the version of the law in force before you plan."
     },
     {
      "type": "callout",
      "kind": "warning",
-     "text": "Because harmonised standards and guidance were running late, the European Commission proposed a 'digital omnibus' package in November 2025 that would postpone high-risk obligations, linking them to the availability of support tools, with backstop dates of December 2027 for listed use areas and August 2028 for regulated products. Always confirm which dates apply in the version of the law in force when you read this.",
+     "text": "Because harmonised standards and guidance were running late, the European Commission proposed a 'digital omnibus' simplification package in November 2025. Among other changes, it would link the start of high-risk obligations to the availability of standards and support tools, with backstop dates of December 2027 for Annex III use areas and August 2028 for regulated products, and would change how the AI literacy duty applies to organisations. The proposal then went through the EU legislative process. **Check the current official timetable**: until an amendment is formally adopted and published in the Official Journal, the legislated dates stand.",
      "title": "Dates may move: check the current text"
     },
     {
@@ -3687,12 +4606,12 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Carry out a fundamental rights impact assessment, assign trained human oversight, set up log retention and monitoring, and prepare notices for affected customers.",
+       "text": "Carry out a fundamental rights impact assessment, assign trained oversight, set up log retention and monitoring, and prepare customer notices.",
        "feedback": "Best. These are core deployer duties for a high-risk credit system, and the FRIA is required before first use.",
        "best": true
       },
       {
-       "text": "Repeat the vendor's conformity assessment in full.",
+       "text": "Repeat the vendor's conformity assessment in full with an external firm, because the bank cannot rely on a provider's own testing of a high-risk credit model.",
        "feedback": "Conformity assessment is the provider's job. The bank should review the documentation, not redo it.",
        "best": false
       },
@@ -3741,26 +4660,36 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Providers of high-risk systems carry the heaviest duties: risk management, data governance, documentation, logging, oversight design, a QMS, conformity assessment and post-market monitoring.",
+      "Deployers must use systems as instructed, assign competent oversight, keep logs, inform people and, in some cases, complete a FRIA before first use.",
+      "GPAI model providers document their models, support downstream providers, respect copyright and publish a training-content summary; the code of practice is one way to show compliance.",
+      "Some dates already apply and others may move under the simplification proposals: plan against the current official text, not headlines."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
-       "q": "Which deployers must carry out a fundamental rights impact assessment before using a high-risk system?",
+       "q": "A private bank in the EU will deploy a high-risk credit-scoring system bought from a certified provider. Which assessment must the bank itself complete before first use?",
        "options": [
-        "All companies using any chatbot",
-        "Public bodies, private providers of public services, and deployers of credit-scoring or life and health insurance pricing systems",
-        "Only providers of general-purpose models",
-        "Only companies outside the EU"
+        "A conformity assessment by a notified body",
+        "A fundamental rights impact assessment",
+        "A public summary of the model's training content",
+        "A repeat of the provider's own technical testing"
        ],
        "answer": 1,
-       "explain": "The FRIA duty targets specific deployer categories where rights impacts are significant."
+       "explain": "Credit-scoring deployers are among those that must carry out a FRIA, together with public bodies, private providers of public services and life or health insurance pricing deployers. Conformity assessment is the provider's job, and training summaries apply to GPAI providers."
       },
       {
        "q": "For how long must deployers keep automatically generated logs of a high-risk system, at minimum?",
        "options": [
-        "At least six months, unless other law requires otherwise",
-        "Seven days",
-        "Ten years in every case",
-        "No retention is required"
+        "At least six months, unless other law differs",
+        "Seven days, after which logs must be deleted",
+        "Ten years in every case, whatever other law says",
+        "No retention is required of deployers at all"
        ],
        "answer": 0,
        "explain": "The Act sets a six-month minimum for deployers, subject to other applicable law."
@@ -3768,10 +4697,10 @@ TRACK.modules.push({
       {
        "q": "What is the maximum fine level for prohibited practices?",
        "options": [
-        "EUR 1 million flat",
-        "1% of EU turnover only",
-        "EUR 35 million or 7% of worldwide annual turnover, whichever is higher",
-        "There is no fine for prohibited practices"
+        "A flat EUR 1 million, regardless of company size or turnover",
+        "1% of EU turnover only, with no fixed euro amount",
+        "EUR 35 million or 7% of worldwide turnover, if higher",
+        "No fine, because prohibited practices are only banned, not penalised"
        ],
        "answer": 2,
        "explain": "Prohibited practices carry the highest penalty band."
@@ -3779,10 +4708,10 @@ TRACK.modules.push({
       {
        "q": "Which duty applies to all general-purpose AI model providers?",
        "options": [
-        "Live facial recognition approval",
-        "A fundamental rights impact assessment",
-        "Registration as a deployer",
-        "A public summary of training content and a copyright compliance policy"
+        "Prior approval for any live facial recognition use",
+        "A fundamental rights impact assessment for every user",
+        "Registration as a deployer in each member state",
+        "A training-content summary and a copyright policy"
        ],
        "answer": 3,
        "explain": "GPAI providers must document their models, support downstream providers, follow copyright law and publish a training-content summary."
@@ -3791,8 +4720,8 @@ TRACK.modules.push({
        "q": "Who supervises general-purpose AI models under the Act?",
        "options": [
         "The AI Office in the European Commission",
-        "Each company's internal auditor",
-        "The OECD",
+        "Each company's own internal audit function",
+        "The OECD's AI policy observatory",
         "National data protection authorities only"
        ],
        "answer": 0,
@@ -3801,7 +4730,7 @@ TRACK.modules.push({
       {
        "q": "A deployer substantially modifies a high-risk system and rebrands it. What follows?",
        "options": [
-        "Nothing changes",
+        "Nothing changes, because the original provider remains responsible",
         "It is treated as a provider with provider obligations",
         "The original provider loses all duties retroactively",
         "The system becomes minimal risk"
@@ -3877,54 +4806,90 @@ TRACK.modules.push({
     {
      "type": "callout",
      "kind": "example",
-     "text": "In July 2024 NIST published a profile applying the framework to generative AI. It lists risks that are new or worse with generative AI, including confabulation, harmful bias and homogenisation, information integrity, information security, intellectual property, data privacy, dangerous or violent content, obscene or abusive content, environmental impacts, human-AI configuration, value-chain and component integration, and chemical, biological, radiological and nuclear information. It then suggests actions mapped to the four functions. The framework is voluntary; US federal policy changed direction in 2025 and revisions to NIST materials have been signalled, so check the current versions.",
+     "text": "In July 2024 NIST published a profile (NIST AI 600-1) applying the framework to generative AI. It lists risks that are new or worse with generative AI, including confabulation, harmful bias and homogenisation, information integrity, information security, intellectual property, data privacy, dangerous or violent content, obscene or abusive content, environmental impacts, human-AI configuration, value-chain and component integration, and chemical, biological, radiological and nuclear information. It then suggests actions mapped to the four functions. The framework is voluntary. US federal AI policy changed direction in 2025, and the national AI action plan published that July called for the framework to be revised, so check which version is current before citing it.",
      "title": "The generative-AI profile"
     },
     {
-     "type": "layers",
-     "title": "ISO/IEC 42001:2023 at a glance (top layer first)",
+     "type": "cycle",
+     "title": "ISO/IEC 42001 as plan-do-check-act",
+     "center": "AI management system",
      "items": [
       {
-       "label": "Improvement (clause 10)",
-       "parts": [
-        "Nonconformity, corrective action, continual improvement"
-       ]
+       "label": "Plan",
+       "text": "Clauses 4–6: context and scope, leadership and AI policy, roles, risks and opportunities, AI objectives, Statement of Applicability"
       },
       {
-       "label": "Performance evaluation (clause 9)",
-       "parts": [
-        "Monitoring, internal audit, management review"
-       ]
+       "label": "Do",
+       "text": "Clauses 7–8: resources, competence, awareness, documented information; operate AI risk treatment and impact assessments"
       },
       {
-       "label": "Operation (clause 8)",
-       "parts": [
-        "Operational planning, AI risk assessment and treatment, AI system impact assessment"
-       ]
+       "label": "Check",
+       "text": "Clause 9: monitoring and measurement, internal audit, management review"
       },
       {
-       "label": "Support (clause 7)",
-       "parts": [
-        "Resources, competence, awareness, communication, documented information"
-       ]
-      },
-      {
-       "label": "Planning (clause 6)",
-       "parts": [
-        "Risks and opportunities, AI objectives, Statement of Applicability"
-       ]
-      },
-      {
-       "label": "Leadership and context (clauses 4-5)",
-       "parts": [
-        "Scope, interested parties, AI policy, roles and top-management commitment"
-       ]
+       "label": "Act",
+       "text": "Clause 10: nonconformity, corrective action and continual improvement"
       }
-     ]
+     ],
+     "caption": "The clauses follow the same loop as other management system standards, so an organisation already running an information security or quality system can extend familiar routines rather than start again."
     },
     {
      "type": "text",
-     "text": "ISO/IEC 42001 is a **management system standard**: it specifies how an organisation should establish, run and improve an AI management system (AIMS), using the same high-level structure as other management system standards such as those for information security and quality. Its Annex A lists reference control objectives and controls, covering areas such as AI policies, internal organisation, resources, impact assessment, the AI system lifecycle, data, information for interested parties, use of AI systems and third-party relationships. Organisations select controls and justify inclusions and exclusions in a **Statement of Applicability**. Companion standards cover AI risk management guidance (ISO/IEC 23894), AI system impact assessment (ISO/IEC 42005), requirements for certification bodies (ISO/IEC 42006), concepts and terminology (ISO/IEC 22989) and governance implications for boards (ISO/IEC 38507)."
+     "text": "ISO/IEC 42001 is a **management system standard**: it specifies how an organisation should establish, run and improve an AI management system (AIMS), using the same high-level structure as other management system standards such as those for information security and quality. Its Annex A lists reference control objectives and controls, covering areas such as AI policies, internal organisation, resources, impact assessment, the AI system lifecycle, data, information for interested parties, use of AI systems and third-party relationships. Organisations select controls and justify inclusions and exclusions in a **Statement of Applicability**. Companion standards cover AI risk management guidance (ISO/IEC 23894), AI system impact assessment (ISO/IEC 42005, published 2025), requirements for bodies that audit and certify AI management systems (ISO/IEC 42006, published 2025), concepts and terminology (ISO/IEC 22989) and governance implications for boards (ISO/IEC 38507). For the EU AI Act, European harmonised standards are being developed by CEN and CENELEC; they were delayed, and only once cited in the Official Journal do they give a presumption of conformity."
+    },
+    {
+     "type": "tree",
+     "title": "The ISO/IEC AI standards family (selection)",
+     "root": {
+      "label": "ISO/IEC AI standards",
+      "children": [
+       {
+        "label": "Foundations",
+        "children": [
+         {
+          "label": "ISO/IEC 22989",
+          "text": "Concepts and terminology"
+         }
+        ]
+       },
+       {
+        "label": "Management system",
+        "children": [
+         {
+          "label": "ISO/IEC 42001",
+          "text": "AIMS requirements (certifiable)"
+         },
+         {
+          "label": "ISO/IEC 42006",
+          "text": "Rules for certification bodies"
+         }
+        ]
+       },
+       {
+        "label": "Risk and impact",
+        "children": [
+         {
+          "label": "ISO/IEC 23894",
+          "text": "AI risk management guidance"
+         },
+         {
+          "label": "ISO/IEC 42005",
+          "text": "AI system impact assessment"
+         }
+        ]
+       },
+       {
+        "label": "Governance",
+        "children": [
+         {
+          "label": "ISO/IEC 38507",
+          "text": "Implications for governing bodies"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Only ISO/IEC 42001 is a certifiable requirements standard for organisations; the others guide how to do the work or how auditors operate. New standards on topics such as testing and transparency keep arriving, so check the current catalogue."
     },
     {
      "type": "callout",
@@ -4014,7 +4979,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Build an AI management system aligned to ISO/IEC 42001, use NIST AI RMF practices inside it for risk work, and map EU AI Act obligations for products sold in Europe.",
+       "text": "Build an ISO/IEC 42001-aligned management system, use NIST AI RMF practices inside it, and map EU AI Act duties for products sold in Europe.",
        "feedback": "Best. The certifiable standard provides verifiable structure; the NIST framework adds practical risk methods; and the legal map covers binding duties.",
        "best": true
       },
@@ -4024,7 +4989,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "Write a proprietary framework so the company is not tied to any standard.",
+       "text": "Write a proprietary responsible-AI framework tailored to the company's own products, so it is not tied to any external standard or certification body.",
        "feedback": "A proprietary approach lacks recognition and independent verification, which is what clients want.",
        "best": false
       }
@@ -4068,6 +5033,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "The NIST AI RMF organises risk work into Govern, Map, Measure and Manage; its generative-AI profile adds risks specific to generative systems.",
+      "ISO/IEC 42001 is a certifiable management system standard built on plan-do-check-act, with Annex A controls justified in a Statement of Applicability.",
+      "Certification shows that a management system conforms within scope; it does not prove that every AI system is lawful, fair or safe.",
+      "Combine instruments: a 42001-style management system, NIST methods inside it and a legal obligation map on top."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -4084,10 +5059,10 @@ TRACK.modules.push({
       {
        "q": "What does an ISO/IEC 42001 certificate demonstrate?",
        "options": [
-        "That every AI system is legally compliant everywhere",
-        "That the organisation's AI management system conforms to the standard within the certified scope",
-        "That the EU AI Act no longer applies",
-        "That models are free of bias"
+        "That every AI system it runs is legally compliant in all markets",
+        "That its AI management system conforms within the certified scope",
+        "That the EU AI Act no longer applies to the certified organisation",
+        "That all its models have been tested and found free of bias"
        ],
        "answer": 1,
        "explain": "Certification evaluates the management system, not the lawfulness of every system."
@@ -4096,9 +5071,9 @@ TRACK.modules.push({
        "q": "In which ISO/IEC 42001 document does an organisation justify the controls it selects or excludes?",
        "options": [
         "Statement of Applicability",
-        "Model card",
-        "Privacy notice",
-        "Incident log"
+        "Model card for each system",
+        "Privacy notice to customers",
+        "Incident and near-miss log"
        ],
        "answer": 0,
        "explain": "The Statement of Applicability records control selection and justification."
@@ -4106,10 +5081,10 @@ TRACK.modules.push({
       {
        "q": "Which statement about the OECD AI Principles is correct?",
        "options": [
-        "They are a binding EU regulation",
-        "They can be certified by auditors",
-        "They are an intergovernmental recommendation, updated in 2024",
-        "They apply only to the United States"
+        "They are a binding EU regulation with fines for any breaches",
+        "They can be certified by accredited auditors",
+        "A non-binding intergovernmental recommendation, updated 2024",
+        "They apply only to organisations in the United States"
        ],
        "answer": 2,
        "explain": "The OECD principles are non-binding and widely adopted."
@@ -4117,7 +5092,7 @@ TRACK.modules.push({
       {
        "q": "Which pairing gives verifiable structure plus practical risk methods?",
        "options": [
-        "OECD principles with a marketing pledge",
+        "OECD principles with a public marketing pledge",
         "A proprietary checklist with no audit",
         "No framework, only legal review",
         "ISO/IEC 42001 with NIST AI RMF practices"
@@ -4166,7 +5141,7 @@ TRACK.modules.push({
       [
        "Bangladesh",
        "Draft national AI policy documents (2024-2025); ordinances in 2025 on cyber security and on personal data protection; ICT Act 2006; Bangladesh Bank and BTRC sector rules",
-       "Building foundations: data protection and cyber security first, AI policy emerging; check gazetted texts and commencement dates"
+       "Building foundations: data protection and cyber security first, AI policy emerging; check gazetted texts, commencement dates and current legal status"
       ],
       [
        "Pakistan",
@@ -4202,7 +5177,7 @@ TRACK.modules.push({
      "rows": [
       [
        "European Union",
-       "AI Act; GDPR",
+       "AI Act (phased application; simplification proposals in progress); GDPR",
        "Applies to exporters placing AI on the EU market or whose outputs are used there"
       ],
       [
@@ -4227,11 +5202,58 @@ TRACK.modules.push({
       ],
       [
        "United States",
-       "No comprehensive federal AI law; state laws such as New York City's bias-audit rule for hiring tools, Colorado's high-risk AI act (scheduled for 2026), Texas and California laws; federal moves since late 2025 to challenge state rules",
+       "No comprehensive federal AI law; state laws such as New York City's bias-audit rule for hiring tools, Colorado's high-risk AI act (start date pushed back to mid-2026 and subject to further amendment efforts), and Texas and California laws on AI use and frontier-model transparency; federal moves since late 2025 to challenge state rules",
        "Patchwork that changes quickly, especially in hiring, insurance and frontier models"
       ]
      ],
      "title": "Other rules that often reach South Asian organisations"
+    },
+    {
+     "type": "timeline",
+     "title": "Selected milestones affecting South Asian organisations",
+     "items": [
+      {
+       "when": "2022",
+       "label": "Sri Lanka PDPA",
+       "text": "Personal Data Protection Act No. 9, phased in and later amended"
+      },
+      {
+       "when": "Aug 2023",
+       "label": "India DPDP Act",
+       "text": "Digital Personal Data Protection Act passed"
+      },
+      {
+       "when": "2025",
+       "label": "National AI policies",
+       "text": "Pakistan and Nepal adopt national AI policies; Japan passes its AI Promotion Act"
+      },
+      {
+       "when": "2025",
+       "label": "Bangladesh ordinances",
+       "text": "Cyber security and personal data protection ordinances issued"
+      },
+      {
+       "when": "Sep 2025",
+       "label": "China labelling rules",
+       "text": "Mandatory labelling of AI-generated content"
+      },
+      {
+       "when": "Nov 2025",
+       "label": "India Rules and guidelines",
+       "text": "DPDP Rules notified with phased commencement; India AI Governance Guidelines released"
+      },
+      {
+       "when": "Jan 2026",
+       "label": "Korea AI Basic Act",
+       "text": "In force, with duties for high-impact and generative AI"
+      },
+      {
+       "when": "Aug 2026",
+       "label": "EU AI Act main date",
+       "text": "Most remaining duties scheduled, subject to the simplification proposals"
+      }
+     ],
+     "caption": "A starting map, not a complete list. Check each entry against the official gazette or regulator website before relying on it."
     },
     {
      "type": "steps",
@@ -4296,6 +5318,109 @@ TRACK.modules.push({
      "rows": 6
     },
     {
+     "type": "topology",
+     "title": "One exporter, three legal regimes",
+     "nodes": [
+      {
+       "id": "gpai",
+       "kind": "model",
+       "label": "GPAI model",
+       "sub": "International provider",
+       "x": 4,
+       "y": 0
+      },
+      {
+       "id": "exp",
+       "kind": "server",
+       "label": "Dhaka exporter",
+       "sub": "Provider of claims scoring",
+       "x": 1,
+       "y": 2
+      },
+      {
+       "id": "bd",
+       "kind": "team",
+       "label": "BD insurers",
+       "sub": "Data and cyber ordinances",
+       "x": 1,
+       "y": 4
+      },
+      {
+       "id": "in",
+       "kind": "team",
+       "label": "Indian insurers",
+       "sub": "DPDP Act and Rules",
+       "x": 3.5,
+       "y": 4
+      },
+      {
+       "id": "ie",
+       "kind": "team",
+       "label": "Irish insurers",
+       "sub": "EU AI Act and GDPR",
+       "x": 6,
+       "y": 4
+      }
+     ],
+     "links": [
+      {
+       "a": "gpai",
+       "b": "exp",
+       "label": "model API"
+      },
+      {
+       "a": "exp",
+       "b": "bd",
+       "label": "licence"
+      },
+      {
+       "a": "exp",
+       "b": "in",
+       "label": "licence"
+      },
+      {
+       "a": "exp",
+       "b": "ie",
+       "label": "licence"
+      }
+     ],
+     "zones": [
+      {
+       "label": "Global model provider",
+       "x": 3,
+       "y": 0,
+       "w": 3,
+       "h": 1,
+       "tone": "neutral"
+      },
+      {
+       "label": "Bangladesh",
+       "x": 0,
+       "y": 2,
+       "w": 2,
+       "h": 4,
+       "tone": "accent"
+      },
+      {
+       "label": "India",
+       "x": 3,
+       "y": 4,
+       "w": 2,
+       "h": 2,
+       "tone": "neutral"
+      },
+      {
+       "label": "Ireland (EU)",
+       "x": 5,
+       "y": 4,
+       "w": 2,
+       "h": 2,
+       "tone": "warn"
+      }
+     ],
+     "caption": "One product meets three legal regimes, so duties must be mapped market by market. The upstream model provider's documentation, terms and changes flow into every market at once."
+    },
+    {
      "type": "case",
      "title": "The Dhaka software exporter",
      "context": "A Dhaka company builds an AI tool that scores insurance claims for fraud and sells it to insurers in Bangladesh, India and Ireland. It uses a general-purpose model from an international provider for document reading. The founders assumed that because Bangladesh has no AI act, governance could wait.",
@@ -4322,7 +5447,7 @@ TRACK.modules.push({
        "best": true
       },
       {
-       "text": "Rely on a news article's summary to update the privacy policy immediately.",
+       "text": "Use a respected newspaper's detailed summary of the ordinance to update the company's privacy policy and staff guidance immediately, so customers see quick action.",
        "feedback": "News summaries can be inaccurate. Policy changes must be based on the official text and legal analysis.",
        "best": false
       },
@@ -4371,15 +5496,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "South Asia governs AI mainly through data protection, cyber security, sector regulators and principles-based guidance rather than standalone AI acts.",
+      "Foreign rules such as the EU AI Act, South Korea's AI Basic Act and China's labelling rules reach South Asian exporters and service providers.",
+      "Status changes fast: verify official texts, commencement dates and current legal status before acting.",
+      "Horizon scanning needs an owner, defined sources, a regular rhythm, impact assessment per system and recorded decisions."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Which best describes India's approach to AI governance as of 2026?",
        "options": [
-        "Principles-based guidelines relying on existing laws and sector regulators, rather than a standalone AI act",
-        "A comprehensive AI act copied from the EU",
-        "A total ban on generative AI",
-        "No rules of any kind"
+        "Guidelines plus existing laws and sector regulators",
+        "A comprehensive AI act closely modelled on the EU law",
+        "A complete ban on generative AI in all sectors",
+        "No rules of any kind until a national AI act passes"
        ],
        "answer": 0,
        "explain": "India's 2025 guidelines favour existing laws, sector regulators and new coordinating institutions."
@@ -4387,10 +5522,10 @@ TRACK.modules.push({
       {
        "q": "For most South Asian organisations today, the main legal hooks for AI are:",
        "options": [
-        "Only the EU AI Act",
-        "Only UNESCO recommendations",
-        "Only tax law",
-        "Data protection, cyber security, consumer and sector rules"
+        "Only the EU AI Act, applied directly in every country",
+        "Only UNESCO's non-binding ethics recommendations",
+        "Only tax and customs law on imported software",
+        "Data, cyber, consumer and sector rules"
        ],
        "answer": 3,
        "explain": "Without AI acts, general and sector laws carry most obligations, and some foreign laws apply through markets."
@@ -4400,8 +5535,8 @@ TRACK.modules.push({
        "options": [
         "Japan's AI Promotion Act",
         "South Korea's AI Basic Act",
-        "The OECD AI Principles",
-        "ISO/IEC 42001"
+        "The updated OECD AI Principles",
+        "ISO/IEC 42001 AI management standard"
        ],
        "answer": 1,
        "explain": "South Korea's framework act took effect in January 2026."
@@ -4409,8 +5544,8 @@ TRACK.modules.push({
       {
        "q": "What is the first step when a new AI-relevant law is announced?",
        "options": [
-        "Update policies from a news summary",
-        "Stop all AI projects",
+        "Update policies straight away from a reliable news summary",
+        "Stop all AI projects until lawyers fully understand it",
         "Obtain the official text and confirm commencement dates",
         "Ignore it until a regulator calls"
        ],
@@ -4420,10 +5555,10 @@ TRACK.modules.push({
       {
        "q": "Why build to international frameworks even where no AI act exists?",
        "options": [
-        "They exempt you from local law",
-        "They are legally binding everywhere",
+        "They exempt the organisation from complying with local law",
+        "They are legally binding in every country that endorses them",
         "They remove the need for legal advice",
-        "They prepare for likely future rules and support exports and tenders"
+        "They prepare for future rules and help win exports"
        ],
        "answer": 3,
        "explain": "International alignment is efficient preparation and a commercial asset, but does not replace local law."
@@ -4462,6 +5597,34 @@ TRACK.modules.push({
     {
      "type": "text",
      "text": "Risk is the effect of uncertainty on objectives. For AI, governance must look at two kinds of objectives at once: the **organisation's** (profit, compliance, reputation) and **people's** (rights, safety, wellbeing). A system can be profitable and still harmful, and a harm to people usually becomes a risk to the organisation later. Good AI risk identification therefore starts from the people affected, not just from the business case."
+    },
+    {
+     "type": "cycle",
+     "title": "The AI risk management loop",
+     "center": "AI risk register",
+     "items": [
+      {
+       "label": "Identify",
+       "text": "People first: stakeholders, taxonomy, lifecycle stages"
+      },
+      {
+       "label": "Assess",
+       "text": "Likelihood, impact and impact overrides; impact assessments"
+      },
+      {
+       "label": "Treat",
+       "text": "Avoid, reduce, transfer or accept within appetite"
+      },
+      {
+       "label": "Monitor",
+       "text": "KRIs, drift, incidents and complaints"
+      },
+      {
+       "label": "Review and report",
+       "text": "Rescore after changes; report themes to leaders"
+      }
+     ],
+     "caption": "This module follows the loop: identification (this lesson), scoring and impact assessment, treatment and appetite, then intake and the register that ties them together. The loop restarts whenever the system, its data or its context changes."
     },
     {
      "type": "table",
@@ -4586,6 +5749,55 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "tree",
+     "title": "Stakeholder map for an electricity-theft model",
+     "root": {
+      "label": "Theft-prediction model",
+      "text": "Power distribution company",
+      "children": [
+       {
+        "label": "Households",
+        "children": [
+         {
+          "label": "Honest users with old meters"
+         },
+         {
+          "label": "Low-income tenants"
+         }
+        ]
+       },
+       {
+        "label": "Field staff",
+        "children": [
+         {
+          "label": "Inspectors and meter readers"
+         }
+        ]
+       },
+       {
+        "label": "Organisation",
+        "children": [
+         {
+          "label": "Revenue and regulator relations"
+         }
+        ]
+       },
+       {
+        "label": "Wider community",
+        "children": [
+         {
+          "label": "Trust in the utility"
+         },
+         {
+          "label": "Stigma for neighbourhoods"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Most people on this map never use the model, yet each can be harmed by it. Asking how every branch could be hurt is what surfaced the fairness and meter-quality risks in the pre-mortem below."
+    },
+    {
      "type": "callout",
      "kind": "example",
      "text": "A power distribution company in Bangladesh planned an AI model to predict electricity theft and prioritise inspections. In a pre-mortem, field staff wrote: 'The model sent inspectors mostly to poorer neighbourhoods where meters are older, so honest households were repeatedly inspected and fined for faulty meters.' This surfaced a fairness risk and a data-quality risk that the business case had missed.",
@@ -4626,12 +5838,12 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "A stakeholder-focused session on harms to applicants: wrong admission advice, unequal quality in Bangla and English, data privacy and the absence of a human contact.",
+       "text": "A session on harms to applicants: wrong admission advice, unequal quality in Bangla and English, privacy and no route to a human.",
        "feedback": "Best. The workshop missed risks to people. Starting from affected applicants surfaces accuracy, fairness, privacy and contestability risks.",
        "best": true
       },
       {
-       "text": "A penetration test of the website.",
+       "text": "A full penetration test of the chatbot and the admissions website, since attackers could tamper with answers or steal applicants' personal details.",
        "feedback": "Security testing matters but is only one category, and the gap is broader.",
        "best": false
       },
@@ -4694,13 +5906,23 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "AI risk covers harms to people and to the organisation; start from the people affected, including non-users.",
+      "Use a taxonomy and a lifecycle view together so that no category or stage is missed.",
+      "Pre-mortems, misuse cases, incident reviews and consultation with affected groups find risks a business case misses.",
+      "Record every risk in the register with an owner; identification is the first turn of a continuing loop."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "Why should AI risk identification start from affected people?",
        "options": [
         "Because organisational risks do not matter",
-        "It finds harms the business case misses, which later become organisational risks",
+        "It finds harms the business case misses",
         "Because regulators ignore business impacts",
         "Because people-centred risks are always minor"
        ],
@@ -4721,10 +5943,10 @@ TRACK.modules.push({
       {
        "q": "Which factor most raises the inherent risk of an AI system?",
        "options": [
-        "It uses a modern programming language",
-        "It runs on a cloud platform",
-        "It has a friendly user interface",
-        "It makes hard-to-reverse decisions about people's access to money or work"
+        "It is written in a modern, fast programming language",
+        "It runs on a large public cloud platform with many users",
+        "It has a friendly, conversational interface that staff enjoy using",
+        "It makes hard-to-reverse decisions about people's money or work"
        ],
        "answer": 3,
        "explain": "Impact on rights and reversibility of outcomes are key risk drivers."
@@ -4743,10 +5965,10 @@ TRACK.modules.push({
       {
        "q": "Which technique specifically considers malicious or careless use?",
        "options": [
-        "Cost-benefit analysis",
+        "Cost-benefit analysis of the project",
         "Misuse and abuse cases",
-        "Load testing",
-        "Annual budgeting"
+        "Load testing of the servers",
+        "Annual budgeting for AI work"
        ],
        "answer": 1,
        "explain": "Misuse cases deliberately explore harmful ways a system could be used."
@@ -4945,6 +6167,44 @@ TRACK.modules.push({
      "title": "Example heat-map placement"
     },
     {
+     "type": "matrix",
+     "title": "Where the example risks sit, and what the override changes",
+     "x": "Likelihood",
+     "y": "Impact on people",
+     "quadrants": [
+      {
+       "title": "Rare but severe: impact override",
+       "items": [
+        "Prompt injection leaks customer records (L2, I5)",
+        "Missed chest pain in triage (L2, I5)",
+        "Treat as high priority despite the score"
+       ]
+      },
+      {
+       "title": "Treat now",
+       "items": [
+        "Credit model disadvantages rural women (L4, I4)",
+        "Priority controls and senior oversight"
+       ]
+      },
+      {
+       "title": "Accept and monitor",
+       "items": [
+        "Rare cosmetic display errors",
+        "Owner reviews at set dates"
+       ]
+      },
+      {
+       "title": "Frequent nuisance: fix efficiently",
+       "items": [
+        "Spam filter misroutes newsletters (L3, I1)",
+        "Queue display delays (L5, I2)"
+       ]
+      }
+     ],
+     "caption": "A 2×2 view simplifies the 5×5 matrix but makes the key point visible: risks in the top-left corner must not be ranked below the bottom-right just because their multiplied scores look similar."
+    },
+    {
      "type": "callout",
      "kind": "warning",
      "text": "Multiplying likelihood by impact can make a rare but catastrophic risk look the same as a frequent nuisance. Use an **impact override**: any risk with impact 5, or impact 4 on vulnerable people, is treated as high priority regardless of its likelihood score.",
@@ -4967,7 +6227,7 @@ TRACK.modules.push({
      "situation": "A hospital AI triage tool has two risks scored 10: rare misclassification of chest pain as low urgency (likelihood 2, impact 5) and frequent minor delays in queue display (likelihood 5, impact 2). The budget allows one major mitigation this quarter. Which should get priority?",
      "options": [
       {
-       "text": "Queue display delays, because they happen more often.",
+       "text": "Queue display delays, because they happen every day, frustrate many patients and staff, and are far more visible to hospital management.",
        "feedback": "Frequency matters, but these delays cause minor, reversible harm.",
        "best": false
       },
@@ -5026,6 +6286,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Score AI risk on likelihood and impact, with impact covering severity, scale, reversibility, vulnerability, autonomy and detectability.",
+      "Inherent risk sets the tier and the depth of assessment; residual risk, after evidenced controls, is compared with appetite.",
+      "Use an impact override so rare but catastrophic risks are never ranked as low priority.",
+      "Scores are ordinal guides: record the reasoning and rescore after significant changes."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -5064,10 +6334,10 @@ TRACK.modules.push({
       {
        "q": "Why use an impact override?",
        "options": [
-        "To make scores look lower for the board",
-        "So rare but catastrophic risks are not ranked as low priority",
-        "To avoid documenting likelihood",
-        "To replace control testing"
+        "To make overall scores look lower in board reports",
+        "So rare, catastrophic risks are not ranked low",
+        "To avoid having to document likelihood estimates",
+        "To replace the testing of control effectiveness"
        ],
        "answer": 1,
        "explain": "Multiplication can understate severe, rare risks; the override corrects this."
@@ -5139,6 +6409,60 @@ TRACK.modules.push({
      "title": "Types of impact assessment"
     },
     {
+     "type": "tree",
+     "title": "One integrated assessment, several purposes",
+     "root": {
+      "label": "AI impact assessment",
+      "children": [
+       {
+        "label": "Core module",
+        "text": "Every assessed system",
+        "children": [
+         {
+          "label": "System and context"
+         },
+         {
+          "label": "Necessity and proportionality"
+         },
+         {
+          "label": "Impacts, mitigations, sign-off"
+         }
+        ]
+       },
+       {
+        "label": "Privacy module",
+        "text": "Meets DPIA duties",
+        "children": [
+         {
+          "label": "High-risk personal data processing"
+         }
+        ]
+       },
+       {
+        "label": "Rights module",
+        "text": "Meets FRIA duties",
+        "children": [
+         {
+          "label": "EU AI Act deployers in scope"
+         }
+        ]
+       },
+       {
+        "label": "Sector add-ons",
+        "children": [
+         {
+          "label": "Clinical safety"
+         },
+         {
+          "label": "Model risk validation"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "One owner completes one template, and each module switches on only when its trigger applies. ISO/IEC 42005 gives guidance on structuring the AI system impact assessment at the core."
+    },
+    {
      "type": "callout",
      "kind": "pro",
      "text": "Design a single AI impact assessment template with modules: a core section for every assessed system, a privacy module that meets DPIA requirements, and a rights module that meets FRIA requirements where the EU AI Act applies. ISO/IEC 42005 offers guidance on structuring AI system impact assessments.",
@@ -5195,6 +6519,74 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "sequence",
+     "title": "Impact assessment approval flow",
+     "actors": [
+      "System owner",
+      "Governance office",
+      "Affected groups",
+      "Privacy and legal",
+      "AI committee"
+     ],
+     "steps": [
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Intake form and system description"
+      },
+      {
+       "from": 1,
+       "to": 0,
+       "label": "High tier: full assessment needed",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 2,
+       "label": "Consultation sessions"
+      },
+      {
+       "from": 2,
+       "to": 0,
+       "label": "Concerns and suggested safeguards",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 3,
+       "label": "DPIA and FRIA modules"
+      },
+      {
+       "from": 3,
+       "to": 0,
+       "label": "Findings and required mitigations",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 1,
+       "label": "Draft assessment with mitigations"
+      },
+      {
+       "from": 1,
+       "to": 4,
+       "label": "Review pack and recommendation"
+      },
+      {
+       "from": 4,
+       "to": 0,
+       "label": "Approve with conditions",
+       "reply": true
+      },
+      {
+       "from": 0,
+       "to": 0,
+       "label": "Schedule post-launch review"
+      }
+     ],
+     "caption": "The owner drives the assessment, but independent voices shape it before the decision: affected groups, privacy and legal, and the governance office's challenge. Conditions attached to approval become tracked actions."
+    },
+    {
      "type": "callout",
      "kind": "insight",
      "text": "The most valuable question in an impact assessment is often 'should we use AI here at all?'. A well-designed form, a clear rule or better staff training sometimes achieves the goal with less risk.",
@@ -5249,12 +6641,12 @@ TRACK.modules.push({
      "situation": "A bank's digital team launched an AI system that sets credit-card limits. Three months later, compliance discovers that no impact assessment was done. What should happen NOW?",
      "options": [
       {
-       "text": "Shut the system down permanently.",
+       "text": "Shut the system down permanently and restore every customer's previous credit limit, since a system launched without assessment can never be trusted again.",
        "feedback": "Possibly necessary if harm is serious, but the first step is to understand the risk quickly. Permanent shutdown without assessment may be disproportionate.",
        "best": false
       },
       {
-       "text": "Complete an urgent impact assessment, review outcomes so far for harm, apply interim safeguards such as human review of reductions, and record the process failure.",
+       "text": "Complete an urgent impact assessment, review outcomes so far, add interim safeguards such as human review of reductions, and record the process failure.",
        "feedback": "Best. It assesses actual impacts, protects customers while assessing, and fixes the process gap that allowed launch without assessment.",
        "best": true
       },
@@ -5312,6 +6704,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "AIIAs, DPIAs, FRIAs and algorithmic impact assessments overlap; one modular process can satisfy them all.",
+      "Require a full assessment for high-impact, sensitive, novel, autonomous or substantially changed systems.",
+      "Necessity and proportionality come first: is AI needed, and is there a less intrusive way?",
+      "Engage affected people, record a clear decision with conditions, revisit after launch and after changes, and never backdate."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -5328,10 +6730,10 @@ TRACK.modules.push({
       {
        "q": "What is the main benefit of an integrated impact assessment template?",
        "options": [
-        "It satisfies several requirements without duplicate forms",
-        "It removes the need for legal review",
-        "It is shorter than any single assessment",
-        "It avoids consulting stakeholders"
+        "It meets several duties without duplicate forms",
+        "It removes the need for any separate legal review",
+        "It is always shorter than any single assessment form",
+        "It avoids the need to consult affected stakeholders"
        ],
        "answer": 0,
        "explain": "Modular templates meet AIIA, DPIA and FRIA needs in one process."
@@ -5339,10 +6741,10 @@ TRACK.modules.push({
       {
        "q": "Which question tests necessity?",
        "options": [
-        "How fast is the model?",
-        "Which cloud region is cheapest?",
-        "Could the goal be achieved with less intrusive means than AI?",
-        "How many features does the model use?"
+        "How fast does the model respond to each request?",
+        "Which cloud region is cheapest for hosting it?",
+        "Could a less intrusive approach achieve the goal?",
+        "How many input features does the final model use?"
        ],
        "answer": 2,
        "explain": "Necessity asks whether AI is required for the goal or a less risky option exists."
@@ -5350,10 +6752,10 @@ TRACK.modules.push({
       {
        "q": "When should an impact assessment be revisited?",
        "options": [
-        "After launch, after significant changes and at a set interval",
-        "Never once signed",
-        "Only when the vendor asks",
-        "Only after a court case"
+        "After launch, after big changes and periodically",
+        "Never again, once it has been signed by the business owner",
+        "Only when the system's vendor asks for an update",
+        "Only after a court case or regulatory investigation"
        ],
        "answer": 0,
        "explain": "Impacts change with use, data and context, so assessments must be living documents."
@@ -5361,10 +6763,10 @@ TRACK.modules.push({
       {
        "q": "A system was launched without the required assessment. What is unacceptable?",
        "options": [
-        "Completing an urgent assessment",
+        "Completing an urgent assessment of the live system",
         "Backdating an assessment to the launch date",
-        "Applying interim safeguards",
-        "Recording the process failure"
+        "Applying interim safeguards while assessing",
+        "Recording the process failure for follow-up"
        ],
        "answer": 1,
        "explain": "Falsifying records compounds the failure and may breach law."
@@ -5492,6 +6894,45 @@ TRACK.modules.push({
      "title": "AI risk appetite: statement, tolerance and KRI"
     },
     {
+     "type": "chart",
+     "kind": "line",
+     "title": "A key risk indicator against its tolerance",
+     "labels": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun"
+     ],
+     "series": [
+      {
+       "name": "Approval-rate ratio",
+       "values": [
+        0.86,
+        0.85,
+        0.84,
+        0.82,
+        0.79,
+        0.77
+       ]
+      },
+      {
+       "name": "Tolerance",
+       "values": [
+        0.8,
+        0.8,
+        0.8,
+        0.8,
+        0.8,
+        0.8
+       ]
+      }
+     ],
+     "yLabel": "Ratio (protected group vs reference)",
+     "caption": "Illustrative numbers. The downward trend was visible for months before the breach in May; a good KRI report shows the direction of travel and triggers escalation at the tolerance, not after it."
+    },
+    {
      "type": "flow",
      "title": "Treatment workflow",
      "items": [
@@ -5562,7 +7003,7 @@ TRACK.modules.push({
      "situation": "A product manager wants to accept a residual fairness risk on a youth employment-matching app because fixing it would delay launch by a month. The risk is scored high. Who should be able to accept it?",
      "options": [
       {
-       "text": "The product manager, because they own the launch date.",
+       "text": "The product manager, because they own the launch date, understand the users best and will be measured on the app's success in its first year.",
        "feedback": "A high residual risk affecting people's access to work exceeds a product manager's authority.",
        "best": false
       },
@@ -5572,7 +7013,7 @@ TRACK.modules.push({
        "best": false
       },
       {
-       "text": "The level set in the risk acceptance rules, typically a senior executive or AI governance committee, checked against the low appetite for unfair outcomes.",
+       "text": "The level set in the acceptance rules, such as a senior executive or the AI committee, checked against the low appetite for unfair outcomes.",
        "feedback": "Best. Acceptance authority should match risk level, and the decision must be checked against stated appetite. Low appetite suggests treatment, not acceptance.",
        "best": true
       },
@@ -5625,6 +7066,16 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "Choose a response for each significant risk: avoid, reduce, transfer or share, or accept within appetite.",
+      "Good controls are specific, owned and testable, and mix preventive, detective, corrective and directive types.",
+      "Contracts and insurance can share financial impact, but accountability to people and regulators stays with you.",
+      "Risk appetite needs measurable tolerances and KRIs, and acceptance authority must match the level of residual risk."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
@@ -5652,10 +7103,10 @@ TRACK.modules.push({
       {
        "q": "Why can't contracts fully transfer AI risk?",
        "options": [
-        "Contracts are illegal for AI",
-        "Suppliers never pay damages",
-        "Accountability to regulators and affected people usually remains with the deployer",
-        "Insurance does not exist for technology"
+        "Contracts about AI systems are not legally valid",
+        "Suppliers never pay damages under any contract",
+        "Accountability usually stays with the deployer",
+        "No insurance exists for technology failures"
        ],
        "answer": 2,
        "explain": "Financial impact can be shared, but responsibility for use generally stays with the deployer."
@@ -5674,10 +7125,10 @@ TRACK.modules.push({
       {
        "q": "Who should accept a high residual risk?",
        "options": [
-        "Whoever built the model",
-        "The most junior tester",
-        "The vendor's sales manager",
-        "An authorised senior level defined in risk acceptance rules"
+        "Whoever built the model, as they know it best",
+        "The most junior tester on the project",
+        "The vendor's sales manager for the account",
+        "A senior level set in the acceptance rules"
        ],
        "answer": 3,
        "explain": "Acceptance authority must match the risk level and be independent of the builders."
@@ -5764,6 +7215,61 @@ TRACK.modules.push({
       ]
      ],
      "title": "Triage questions that drive the tier"
+    },
+    {
+     "type": "tree",
+     "title": "Tiering decision tree",
+     "root": {
+      "label": "New AI use case",
+      "children": [
+       {
+        "label": "Could it be a prohibited practice?",
+        "children": [
+         {
+          "label": "T0",
+          "text": "Stop and escalate to legal"
+         }
+        ]
+       },
+       {
+        "label": "Shapes access to work, credit, education, health, housing, benefits or justice?",
+        "children": [
+         {
+          "label": "T3",
+          "text": "High tier: full assessment"
+         }
+        ]
+       },
+       {
+        "label": "Sensitive data, profiling at scale or public-facing content?",
+        "children": [
+         {
+          "label": "T2",
+          "text": "Medium tier: light assessment"
+         }
+        ]
+       },
+       {
+        "label": "Internal productivity with no personal or confidential data?",
+        "children": [
+         {
+          "label": "T1",
+          "text": "Low tier: fast track"
+         }
+        ]
+       },
+       {
+        "label": "Acts without human approval?",
+        "children": [
+         {
+          "label": "+1",
+          "text": "Raise the tier by one level"
+         }
+        ]
+       }
+      ]
+     },
+     "caption": "Work from the top and take the highest tier any branch gives. The autonomy question applies on top of the others, which is why an agent with powerful tools rarely stays in the low tier."
     },
     {
      "type": "framework",
@@ -5885,12 +7391,12 @@ TRACK.modules.push({
      "situation": "After launching a fast track for low-tier AI, an audit finds a 'low-tier' marketing tool that actually scores customers' likelihood of defaulting on payments and is used to decide who receives payment-plan offers. What is the BEST fix?",
      "options": [
       {
-       "text": "Abolish the fast track and send everything to full review.",
+       "text": "Abolish the fast track and send every AI idea, however small, to full review by the ethics committee so that no high-risk use can slip through again.",
        "feedback": "This punishes the many correctly tiered ideas and will revive shadow AI.",
        "best": false
       },
       {
-       "text": "Retier the tool, add a triage question on decisions about people's financial access, spot-check a sample of fast-track approvals and require owners to re-register when use changes.",
+       "text": "Retier the tool, add a triage question on financial-access decisions, spot-check fast-track approvals and require re-registration when use changes.",
        "feedback": "Best. It corrects this case, strengthens the screening logic and adds detective controls without losing the benefit of the fast track.",
        "best": true
       },
@@ -5944,15 +7450,25 @@ TRACK.modules.push({
      ]
     },
     {
+     "type": "keypoints",
+     "title": "Key takeaways",
+     "items": [
+      "A short intake is the front door: it gives visibility and routes each idea to the right depth of review.",
+      "Triage questions on prohibited uses, decisions about people, sensitive data, public exposure and autonomy drive the tier.",
+      "Fast, predictable approvals for low-risk ideas are the best defence against shadow AI; spot-check the fast track.",
+      "Keep one AI risk register linked to enterprise risk, and report aggregated themes rather than long lists."
+     ]
+    },
+    {
      "type": "quiz",
      "items": [
       {
        "q": "What is the main purpose of AI use-case intake?",
        "options": [
-        "To slow down all AI projects equally",
-        "To replace impact assessments",
-        "To see every AI idea early and route it to the right depth of review",
-        "To select vendors by price"
+        "To slow down every AI project equally so none is favoured",
+        "To replace the need for any impact assessments",
+        "To see AI ideas early and route them proportionately",
+        "To select AI vendors on price alone"
        ],
        "answer": 2,
        "explain": "Intake gives visibility and proportionate routing."
@@ -5971,10 +7487,10 @@ TRACK.modules.push({
       {
        "q": "Which triage answer should raise a system's tier by one level?",
        "options": [
-        "It uses a modern framework",
+        "It is built on a modern open-source framework",
         "It can take actions without human approval",
-        "It is hosted internally",
-        "It has a short name"
+        "It is hosted in the company's own data centre",
+        "It has a short and memorable product name"
        ],
        "answer": 1,
        "explain": "Autonomy increases the potential for unchecked harm."
@@ -5982,10 +7498,10 @@ TRACK.modules.push({
       {
        "q": "How should system-level AI risks be reported to the board?",
        "options": [
-        "Aggregated into a few enterprise themes with counts, trends and worst residual scores",
-        "As a list of every risk on every system",
-        "Not at all",
-        "Only when a regulator asks"
+        "As a few themes with counts, trends and worst residuals",
+        "As a complete list of every risk on every single system",
+        "Not at all, since owners manage their own risks",
+        "Only when a regulator formally asks to see them"
        ],
        "answer": 0,
        "explain": "Aggregation makes AI risk decision-ready for the board."
@@ -5993,10 +7509,10 @@ TRACK.modules.push({
       {
        "q": "What is the best evidence that the intake process is working?",
        "options": [
-        "More forms submitted per week regardless of quality",
-        "Longer review times",
-        "Fewer approvals overall",
-        "A rising share of AI registered before launch and fewer systems found outside it"
+        "More forms submitted each week, regardless of their quality",
+        "Longer and more detailed review times",
+        "Fewer approvals overall across all tiers",
+        "More AI registered before launch, fewer found outside"
        ],
        "answer": 3,
        "explain": "Coverage before launch and fewer surprises show the front door is used."
@@ -6262,15 +7778,15 @@ TRACK.exam.push([
  },
  {
   "module": "m3",
-  "q": "A company's legal team learns that high-risk deadlines in the EU AI Act may be postponed by a proposed amendment. What should the AI governance lead do?",
+  "q": "A product team reads a headline saying the EU has 'delayed the AI Act' and wants to stop preparing its high-risk credit-scoring system. What should the AI governance lead do?",
   "options": [
-   "Pause all high-risk compliance work until the amendment is finally adopted",
-   "Track the amendment but keep building controls on the legislated timeline",
-   "Assume the postponement applies and tell product teams to stop preparing",
-   "Ignore the proposal because amendments to EU law are never adopted"
+   "Stop all high-risk compliance work until another headline confirms the new dates",
+   "Confirm the dates in the current official text and keep building controls",
+   "Assume every obligation is postponed by two years and tell teams to pause",
+   "Ignore it, because EU laws can never be amended once adopted"
   ],
   "answer": 1,
-  "explain": "Proposals may change or fail. Prudent programmes monitor while continuing preparation, since the controls are good practice either way."
+  "explain": "Proposals and headlines are not law. Until an amendment is formally adopted and published, the legislated dates apply, and the controls are good practice either way. Pausing on a headline or assuming the law cannot change are both risky."
  },
  {
   "module": "m3",
